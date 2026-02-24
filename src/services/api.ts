@@ -9,18 +9,28 @@ const api: AxiosInstance = axios.create({
   withCredentials: true,
 });
 
+let isRedirectingToLogin = false;
+
+function redirectToLogin() {
+  if (isRedirectingToLogin) return;
+  isRedirectingToLogin = true;
+  keycloak.login();
+}
+
 // Request interceptor
 api.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    try {
-      await keycloak.updateToken(30);
-    } catch {
-      keycloak.login();
-      return Promise.reject(new Error('Token refresh failed'));
-    }
+    if (keycloak.authenticated) {
+      try {
+        await keycloak.updateToken(30);
+      } catch {
+        redirectToLogin();
+        return Promise.reject(new Error('Token refresh failed'));
+      }
 
-    if (keycloak.token && config.headers) {
-      config.headers.Authorization = `Bearer ${keycloak.token}`;
+      if (keycloak.token && config.headers) {
+        config.headers.Authorization = `Bearer ${keycloak.token}`;
+      }
     }
     return config;
   },
@@ -34,7 +44,7 @@ api.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
     if (error.response?.status === 401) {
-      keycloak.login();
+      redirectToLogin();
     }
     return Promise.reject(error);
   },

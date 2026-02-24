@@ -327,7 +327,6 @@ export default function ClientDetailPage() {
                         <thead>
                           <tr className="border-b border-[--k-border]">
                             <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Référence</th>
-                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Objet</th>
                             <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Date</th>
                             <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Montant HT</th>
                             <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Montant TTC</th>
@@ -337,10 +336,20 @@ export default function ClientDetailPage() {
                         <tbody>
                           {devisRefs.map((d) => {
                             const st = DEVIS_STATUS_LABELS[d.status] || DEVIS_STATUS_LABELS.brouillon;
+                            // Strip HTML tags from objet for tooltip
+                            const objetText = d.objet ? d.objet.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
                             return (
                               <tr key={d.id} className="border-t border-[--k-border] hover:bg-[--k-surface-2] transition-colors">
-                                <td className="px-3 py-2 font-medium text-[--k-primary]">{d.indent || `#${d.id}`}</td>
-                                <td className="px-3 py-2 text-[--k-text]">{d.objet || '--'}</td>
+                                <td className="px-3 py-2 font-medium text-[--k-primary]">
+                                  <span className="group/devis relative cursor-default">
+                                    {d.indent || `#${d.id}`}
+                                    {objetText && (
+                                      <span className="pointer-events-none absolute left-0 top-full z-50 mt-1 hidden max-w-xs rounded-lg bg-slate-900 px-3 py-2 text-[12px] font-normal text-white shadow-lg group-hover/devis:block">
+                                        {objetText}
+                                      </span>
+                                    )}
+                                  </span>
+                                </td>
                                 <td className="px-3 py-2 text-[--k-muted]">{d.dateCreation ? formatDate(d.dateCreation) : '--'}</td>
                                 <td className="px-3 py-2 text-right font-medium text-[--k-text]">{d.totalHt ? formatCurrency(d.totalHt) : '--'}</td>
                                 <td className="px-3 py-2 text-right text-[--k-muted]">{d.totalTtc ? formatCurrency(d.totalTtc) : '--'}</td>
@@ -453,36 +462,65 @@ export default function ClientDetailPage() {
                 <button onClick={() => setActiveTab(null)} className="text-[12px] text-[--k-primary] hover:underline mb-3 block">Fermer</button>
 
                 {client.contacts && client.contacts.length > 0 ? (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full text-[13px]">
-                      <thead>
-                        <tr className="border-b border-[--k-border]">
-                          <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Nom</th>
-                          <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Fonction</th>
-                          <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Email</th>
-                          <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Téléphone</th>
-                          <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Principal</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {client.contacts.map((contact) => (
-                          <tr key={contact.id} className="border-t border-[--k-border] hover:bg-[--k-surface-2] transition-colors">
-                            <td className="px-3 py-2 font-medium text-[--k-text]">
-                              {contact.civilite && <span className="text-[--k-muted]">{contact.civilite}. </span>}
-                              {contact.prenom} {contact.nom}
-                            </td>
-                            <td className="px-3 py-2 text-[--k-muted]">{contact.position || '--'}</td>
-                            <td className="px-3 py-2 text-[--k-muted]">{contact.email || '--'}</td>
-                            <td className="px-3 py-2 text-[--k-muted]">{contact.tel || '--'}</td>
-                            <td className="px-3 py-2">
-                              {contact.is_primary && (
-                                <span className="inline-flex px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 rounded-full">Principal</span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="space-y-4">
+                    {(() => {
+                      // Group contacts by contact_type
+                      const grouped = new Map<string, typeof client.contacts>();
+                      for (const contact of client.contacts!) {
+                        const typeName = contact.contact_type?.nom || 'Autre';
+                        if (!grouped.has(typeName)) grouped.set(typeName, []);
+                        grouped.get(typeName)!.push(contact);
+                      }
+                      return Array.from(grouped.entries()).map(([typeName, contacts]) => (
+                        <div key={typeName}>
+                          <h4 className="text-[13px] font-semibold text-[--k-text] mb-2 flex items-center gap-2">
+                            <Users className="w-4 h-4 text-[--k-primary]" />
+                            {typeName}
+                            <span className="text-[11px] font-normal text-[--k-muted]">({contacts.length})</span>
+                          </h4>
+                          <div className="overflow-x-auto">
+                            <table className="min-w-full text-[13px]">
+                              <thead>
+                                <tr className="border-b border-[--k-border]">
+                                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Nom</th>
+                                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Fonction</th>
+                                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Email</th>
+                                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Téléphone</th>
+                                  <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Principal</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {contacts.map((contact) => (
+                                  <tr key={contact.id} className="border-t border-[--k-border] hover:bg-[--k-surface-2] transition-colors">
+                                    <td className="px-3 py-2 font-medium text-[--k-text]">
+                                      {contact.civilite && <span className="text-[--k-muted]">{contact.civilite}. </span>}
+                                      {contact.prenom} {contact.nom}
+                                    </td>
+                                    <td className="px-3 py-2 text-[--k-muted]">{contact.position || '--'}</td>
+                                    <td className="px-3 py-2 text-[--k-muted]">
+                                      {contact.email ? (
+                                        <a href={`mailto:${contact.email}`} className="text-[--k-primary] hover:underline">{contact.email}</a>
+                                      ) : '--'}
+                                    </td>
+                                    <td className="px-3 py-2 text-[--k-muted]">
+                                      {contact.tel || contact.telephone_2 || '--'}
+                                      {contact.tel && contact.telephone_2 && (
+                                        <span className="text-[--k-muted] ml-1">/ {contact.telephone_2}</span>
+                                      )}
+                                    </td>
+                                    <td className="px-3 py-2">
+                                      {contact.is_primary && (
+                                        <span className="inline-flex px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 rounded-full">Principal</span>
+                                      )}
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      ));
+                    })()}
                   </div>
                 ) : (
                   <p className="text-[13px] text-[--k-muted]">Aucun contact pour ce client.</p>

@@ -27,6 +27,7 @@ const RichTextEditor = forwardRef<RichTextEditorRef, RichTextEditorProps>(
       extensions: [
         StarterKit.configure({
           heading: { levels: [2, 3] },
+          underline: false,
         }),
         Underline,
         Image.configure({

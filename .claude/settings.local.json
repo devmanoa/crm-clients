@@ -19,7 +19,13 @@
       "Bash(npm ls:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:clgGvsgBdAEAYbaALTbqFglcaYiRwJQS@postgres-wwc8.railway.internal:5432/railway\" npx prisma db push:*)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:clgGvsgBdAEAYbaALTbqFglcaYiRwJQS@crossover.proxy.rlwy.net:15615/railway\" npx prisma db push:*)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:clgGvsgBdAEAYbaALTbqFglcaYiRwJQS@postgres-wwc8-production.up.railway.app:5432/railway\" npx prisma db push:*)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:clgGvsgBdAEAYbaALTbqFglcaYiRwJQS@postgres-wwc8-production.up.railway.app:15615/railway\" npx prisma db push:*)",
+      "Bash(DATABASE_URL=\"postgresql://postgres:clgGvsgBdAEAYbaALTbqFglcaYiRwJQS@crossover.proxy.rlwy.net:15615/railway\" npx prisma db seed:*)",
+      "WebFetch(domain:konitys-hub-prod.up.railway.app)"
     ]
   }
 }

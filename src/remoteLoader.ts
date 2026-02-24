@@ -21,23 +21,33 @@ function ensureSharedScope() {
 
   const shared = g.__federation_shared__['default'];
 
+  // Provide React under multiple version keys so the remote finds a match
+  // regardless of which version it was built against.
+  const reactEntry = {
+    get: () => () => React,
+    loaded: true,
+    scope: 'default',
+  };
+  const reactDomEntry = {
+    get: () => () => ReactDOM,
+    loaded: true,
+    scope: 'default',
+  };
+
   if (!shared['react']) {
-    shared['react'] = {
-      '18.3.1': {
-        get: () => () => React,
-        scope: 'default',
-      },
-    };
+    shared['react'] = {};
   }
+  shared['react'][React.version] = reactEntry;
+  // Also register under common 18.x keys the remote might request
+  shared['react']['18.3.1'] = reactEntry;
+  shared['react']['18.0.0'] = reactEntry;
 
   if (!shared['react-dom']) {
-    shared['react-dom'] = {
-      '18.3.1': {
-        get: () => () => ReactDOM,
-        scope: 'default',
-      },
-    };
+    shared['react-dom'] = {};
   }
+  shared['react-dom'][React.version] = reactDomEntry;
+  shared['react-dom']['18.3.1'] = reactDomEntry;
+  shared['react-dom']['18.0.0'] = reactDomEntry;
 }
 
 let containerPromise: Promise<RemoteContainer> | null = null;
@@ -49,7 +59,8 @@ function loadRemoteEntry(): Promise<RemoteContainer> {
 
   containerPromise = import(/* @vite-ignore */ `${PLATEFORM_URL}/assets/remoteEntry.js`)
     .then((container: RemoteContainer) => {
-      container.init({});
+      const g = globalThis as any;
+      container.init(g.__federation_shared__?.['default'] || {});
       return container;
     })
     .catch((err) => {

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation - CRM Clients Frontend</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f8fafc; color: #1e293b; line-height: 1.6; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+    header { background: linear-gradient(135deg, #2563eb, #7c3aed); color: white; padding: 3rem 0; margin-bottom: 2rem; }
+    header .container { display: flex; align-items: center; gap: 1.5rem; }
+    header .logo { width: 64px; height: 64px; background: rgba(255,255,255,0.2); border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
+    header h1 { font-size: 2rem; font-weight: 700; }
+    header p { opacity: 0.85; margin-top: 0.25rem; }
+    .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; margin-right: 0.4rem; }
+    .badge-blue { background: #dbeafe; color: #1d4ed8; }
+    .badge-green { background: #dcfce7; color: #166534; }
+    .badge-purple { background: #f3e8ff; color: #7c3aed; }
+    .badge-orange { background: #ffedd5; color: #c2410c; }
+    .card { background: white; border-radius: 12px; border: 1px solid #e2e8f0; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
+    .card h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 2px solid #e2e8f0; display: flex; align-items: center; gap: 0.5rem; }
+    .card h3 { font-size: 1rem; font-weight: 600; margin: 1rem 0 0.5rem; color: #475569; }
+    table { width: 100%; border-collapse: collapse; margin: 0.75rem 0; font-size: 0.9rem; }
+    th { text-align: left; padding: 0.6rem 0.75rem; background: #f8fafc; border-bottom: 2px solid #e2e8f0; font-weight: 600; color: #475569; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    td { padding: 0.6rem 0.75rem; border-bottom: 1px solid #f1f5f9; }
+    tr:hover td { background: #f8fafc; }
+    code { background: #f1f5f9; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.85em; color: #7c3aed; font-family: 'Cascadia Code', 'Fira Code', monospace; }
+    pre { background: #1e293b; color: #e2e8f0; padding: 1rem 1.25rem; border-radius: 8px; overflow-x: auto; margin: 0.75rem 0; font-size: 0.85rem; line-height: 1.7; }
+    pre code { background: none; color: inherit; padding: 0; }
+    .tree { font-family: 'Cascadia Code', 'Fira Code', monospace; font-size: 0.85rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem 1.25rem; line-height: 1.8; }
+    .tree .folder { color: #2563eb; font-weight: 600; }
+    .tree .file { color: #475569; }
+    .tree .comment { color: #94a3b8; font-style: italic; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .stat-card { text-align: center; padding: 1.25rem; background: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0; }
+    .stat-card .number { font-size: 2rem; font-weight: 700; color: #2563eb; }
+    .stat-card .label { font-size: 0.8rem; color: #64748b; margin-top: 0.25rem; }
+    .flow { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin: 0.75rem 0; }
+    .flow-step { padding: 0.5rem 1rem; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; font-size: 0.85rem; font-weight: 500; color: #1d4ed8; }
+    .flow-arrow { color: #94a3b8; font-weight: 700; }
+    .nav { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .nav a { padding: 0.5rem 1rem; background: white; border: 1px solid #e2e8f0; border-radius: 8px; text-decoration: none; color: #475569; font-size: 0.85rem; font-weight: 500; transition: all 0.15s; }
+    .nav a:hover { background: #eff6ff; border-color: #bfdbfe; color: #2563eb; }
+    @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } .container { padding: 1rem; } }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="logo">&#x1f4bb;</div>
+    <div>
+      <h1>CRM Clients - Frontend</h1>
+      <p>Application React TypeScript pour la gestion des clients et opportunites</p>
+      <div style="margin-top: 0.75rem">
+        <span class="badge badge-blue">React 19</span>
+        <span class="badge badge-green">TypeScript</span>
+        <span class="badge badge-purple">Vite</span>
+        <span class="badge badge-orange">Tailwind CSS v4</span>
+        <span class="badge badge-blue">Zustand</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+<nav class="nav">
+  <a href="#stack">Stack</a>
+  <a href="#structure">Structure</a>
+  <a href="#pages">Pages</a>
+  <a href="#store">Store</a>
+  <a href="#api">API Service</a>
+  <a href="#demarrage">Demarrage</a>
+  <a href="#env">Configuration</a>
+</nav>
+
+<!-- Stack -->
+<div class="card" id="stack">
+  <h2>&#x1f528; Stack Technique</h2>
+  <div class="grid-2">
+    <div class="stat-card"><div class="number">React 19</div><div class="label">Interface utilisateur</div></div>
+    <div class="stat-card"><div class="number">TypeScript</div><div class="label">Typage statique</div></div>
+    <div class="stat-card"><div class="number">Vite</div><div class="label">Bundler &amp; Dev Server</div></div>
+    <div class="stat-card"><div class="number">Tailwind v4</div><div class="label">CSS utilitaire</div></div>
+  </div>
+  <table>
+    <thead><tr><th>Librairie</th><th>Usage</th></tr></thead>
+    <tbody>
+      <tr><td><code>react-router-dom v7</code></td><td>Routing SPA (nested routes + layout)</td></tr>
+      <tr><td><code>zustand</code></td><td>State management (stores par module)</td></tr>
+      <tr><td><code>axios</code></td><td>Client HTTP avec interceptors (auth Bearer)</td></tr>
+      <tr><td><code>react-hook-form</code> + <code>zod</code></td><td>Gestion de formulaires et validation</td></tr>
+      <tr><td><code>lucide-react</code></td><td>Icones SVG</td></tr>
+      <tr><td><code>date-fns</code></td><td>Manipulation de dates (locale fr)</td></tr>
+      <tr><td><code>recharts</code></td><td>Graphiques pour les dashboards</td></tr>
+      <tr><td><code>@hello-pangea/dnd</code></td><td>Drag-and-drop pour le Kanban pipeline</td></tr>
+      <tr><td><code>class-variance-authority</code> + <code>tailwind-merge</code></td><td>Utilitaires CSS (cn() helper)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Structure -->
+<div class="card" id="structure">
+  <h2>&#x1f4c1; Structure du Projet</h2>
+  <div class="tree">
+    <span class="folder">crm-clients/</span><br>
+    ├── <span class="file">index.html</span><br>
+    ├── <span class="file">vite.config.ts</span> <span class="comment"># Alias @/, proxy API, plugin Tailwind</span><br>
+    ├── <span class="file">tsconfig.app.json</span> <span class="comment"># Paths: @/* → ./src/*</span><br>
+    └── <span class="folder">src/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">main.tsx</span> <span class="comment"># Point d'entree</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">App.tsx</span> <span class="comment"># Router + Routes</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">index.css</span> <span class="comment"># Tailwind v4 + theme couleurs</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder">config/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">api.ts</span> <span class="comment"># API_CONFIG + API_ENDPOINTS</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">keycloak.ts</span> <span class="comment"># Config Keycloak SSO</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder">types/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">client.ts</span> <span class="comment"># Client, ClientContact, ClientFilters, etc.</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">common.ts</span> <span class="comment"># ApiResponse, PaginatedResponse, Pagination</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">opportunity.ts</span> <span class="comment"># (a venir)</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder">services/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="file">api.ts</span> <span class="comment"># Instance Axios + interceptors</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">clientService.ts</span> <span class="comment"># Appels API clients, contacts, commentaires, ref data</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder">stores/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">clientStore.ts</span> <span class="comment"># Zustand store (list, detail, filters, ref data, bulk)</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder">lib/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="file">utils.ts</span> <span class="comment"># cn(), formatDate(), formatCurrency()</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder">components/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="folder">layout/</span> <span class="comment"># AppLayout, Sidebar, Header</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="folder">common/</span> <span class="comment"># Pagination, LoadingSpinner, EmptyState, ConfirmDialog</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="folder">clients/</span> <span class="comment"># ClientFilters, ClientTable, ClientForm</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;├── <span class="folder">opportunities/</span> <span class="comment"># KanbanBoard, KanbanCard (a venir)</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;│&nbsp;&nbsp;&nbsp;└── <span class="folder">comments/</span> <span class="comment"># CommentList, CommentForm (a venir)</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;└── <span class="folder">pages/</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="folder">clients/</span> <span class="comment"># ListPage, CreatePage, EditPage, DetailPage</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="folder">opportunities/</span> <span class="comment"># (a venir)</span>
+  </div>
+</div>
+
+<!-- Pages -->
+<div class="card" id="pages">
+  <h2>&#x1f4c4; Pages &amp; Routes</h2>
+  <table>
+    <thead><tr><th>Route</th><th>Page</th><th>Description</th><th>Statut</th></tr></thead>
+    <tbody>
+      <tr><td><code>/clients</code></td><td>ClientListPage</td><td>Liste paginee avec filtres avances, tri, selection en masse</td><td><span class="badge badge-green">Fait</span></td></tr>
+      <tr><td><code>/clients/add</code></td><td>ClientCreatePage</td><td>Formulaire creation (Pro/Particulier, contacts, secteurs)</td><td><span class="badge badge-green">Fait</span></td></tr>
+      <tr><td><code>/clients/:id</code></td><td>ClientDetailPage</td><td>Fiche detail avec 4 onglets (Info, Contacts, Commentaires, Opportunites)</td><td><span class="badge badge-green">Fait</span></td></tr>
+      <tr><td><code>/clients/:id/edit</code></td><td>ClientEditPage</td><td>Edition du client avec formulaire pre-rempli</td><td><span class="badge badge-green">Fait</span></td></tr>
+      <tr><td><code>/clients/dashboard</code></td><td>ClientDashboardPage</td><td>Top clients par CA, graphiques par departement/region</td><td><span class="badge badge-orange">A venir</span></td></tr>
+      <tr><td><code>/clients/duplicates</code></td><td>ClientDuplicatesPage</td><td>Detection et fusion de doublons</td><td><span class="badge badge-orange">A venir</span></td></tr>
+      <tr><td><code>/clients/:id/merge</code></td><td>ClientMergePage</td><td>Comparaison et fusion cote a cote</td><td><span class="badge badge-orange">A venir</span></td></tr>
+      <tr><td><code>/opportunities</code></td><td>OpportunityListPage</td><td>Liste avec filtres (statut, pipeline, commercial, periode)</td><td><span class="badge badge-orange">A venir</span></td></tr>
+      <tr><td><code>/opportunities/pipeline</code></td><td>OpportunityPipelinePage</td><td>Vue Kanban drag-and-drop</td><td><span class="badge badge-orange">A venir</span></td></tr>
+      <tr><td><code>/opportunities/dashboard</code></td><td>OpportunityDashboardPage</td><td>Analytique leads par jour/mois, par secteur</td><td><span class="badge badge-orange">A venir</span></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Store -->
+<div class="card" id="store">
+  <h2>&#x1f9e0; State Management (Zustand)</h2>
+  <p>Le store <code>clientStore.ts</code> centralise l'etat du module clients :</p>
+  <h3>State</h3>
+  <table>
+    <thead><tr><th>Propriete</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>clients</code></td><td><code>Client[]</code></td><td>Liste des clients affiches</td></tr>
+      <tr><td><code>pagination</code></td><td><code>Pagination</code></td><td>Page courante, total, totalPages</td></tr>
+      <tr><td><code>filters</code></td><td><code>ClientFilters</code></td><td>Tous les filtres actifs (key, type, groupe, etc.)</td></tr>
+      <tr><td><code>isLoading</code></td><td><code>boolean</code></td><td>Chargement de la liste</td></tr>
+      <tr><td><code>currentClient</code></td><td><code>Client | null</code></td><td>Client en cours de consultation</td></tr>
+      <tr><td><code>selectedIds</code></td><td><code>number[]</code></td><td>IDs selectionnes pour actions en masse</td></tr>
+      <tr><td><code>groupes, sources, secteurs, countries</code></td><td>ref data arrays</td><td>Donnees de reference (chargees 1 fois)</td></tr>
+    </tbody>
+  </table>
+  <h3>Actions</h3>
+  <table>
+    <thead><tr><th>Action</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>fetchClients()</code></td><td>Charge la liste avec les filtres courants</td></tr>
+      <tr><td><code>fetchClientById(id)</code></td><td>Charge le detail d'un client</td></tr>
+      <tr><td><code>setFilters(partial)</code></td><td>Met a jour les filtres et recharge (page = 1)</td></tr>
+      <tr><td><code>resetFilters()</code></td><td>Reinitialise tous les filtres</td></tr>
+      <tr><td><code>setPage(page)</code></td><td>Change la page de pagination</td></tr>
+      <tr><td><code>setSort(sortBy, sortOrder)</code></td><td>Change le tri</td></tr>
+      <tr><td><code>deleteClient(id)</code></td><td>Suppression douce + recharge</td></tr>
+      <tr><td><code>bulkAction(action, sectorIds?)</code></td><td>Action en masse (delete, assign_sectors)</td></tr>
+      <tr><td><code>fetchReferenceData()</code></td><td>Charge groupes, sources, secteurs, pays, types contacts</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- API Service -->
+<div class="card" id="api">
+  <h2>&#x1f310; API Service</h2>
+  <p>Le fichier <code>services/clientService.ts</code> encapsule tous les appels API :</p>
+
+  <h3>Architecture des appels</h3>
+  <div class="flow">
+    <div class="flow-step">Composant React</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">Zustand Store</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">clientService</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">Axios (api.ts)</div>
+    <span class="flow-arrow">→</span>
+    <div class="flow-step">API Backend</div>
+  </div>
+
+  <h3>Interceptors Axios</h3>
+  <ul style="margin: 0.5rem 0; padding-left: 1.5rem;">
+    <li><strong>Request</strong> : Ajoute automatiquement le token Bearer depuis <code>localStorage</code></li>
+    <li><strong>Response 401</strong> : Supprime le token et redirige vers <code>/login</code></li>
+  </ul>
+
+  <h3>Fonctions disponibles</h3>
+  <table>
+    <thead><tr><th>Fonction</th><th>Methode</th><th>Endpoint</th></tr></thead>
+    <tbody>
+      <tr><td><code>getList(filters)</code></td><td>GET</td><td><code>/api/clients/clients</code></td></tr>
+      <tr><td><code>getById(id)</code></td><td>GET</td><td><code>/api/clients/clients/:id</code></td></tr>
+      <tr><td><code>create(data)</code></td><td>POST</td><td><code>/api/clients/clients</code></td></tr>
+      <tr><td><code>update(id, data)</code></td><td>PUT</td><td><code>/api/clients/clients/:id</code></td></tr>
+      <tr><td><code>delete(id)</code></td><td>DELETE</td><td><code>/api/clients/clients/:id</code></td></tr>
+      <tr><td><code>search(query)</code></td><td>GET</td><td><code>/api/clients/clients/search?q=</code></td></tr>
+      <tr><td><code>getContacts(clientId)</code></td><td>GET</td><td><code>/api/clients/clients/:id/contacts</code></td></tr>
+      <tr><td><code>getComments(clientId)</code></td><td>GET</td><td><code>/api/clients/clients/:id/comments</code></td></tr>
+      <tr><td><code>createComment(clientId, contenu, files)</code></td><td>POST</td><td><code>/api/clients/clients/:id/comments</code></td></tr>
+      <tr><td><code>getGroups()</code></td><td>GET</td><td><code>/api/clients/reference-data/groups</code></td></tr>
+      <tr><td><code>getSectors()</code></td><td>GET</td><td><code>/api/clients/reference-data/sectors</code></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Demarrage -->
+<div class="card" id="demarrage">
+  <h2>&#x1f680; Demarrage</h2>
+  <h3>Prerequis</h3>
+  <ul style="padding-left: 1.5rem; margin-bottom: 1rem;">
+    <li>Node.js 18+</li>
+    <li>Le backend <code>konitys-api-clients</code> doit tourner sur le port 3004</li>
+  </ul>
+  <h3>Installation &amp; lancement</h3>
+  <pre><code># Installation des dependances
+npm install
+
+# Lancement en mode developpement (port 5173)
+npm run dev
+
+# Build de production
+npm run build
+
+# Verification TypeScript
+npx tsc --noEmit</code></pre>
+
+  <h3>Proxy de developpement</h3>
+  <p>Le fichier <code>vite.config.ts</code> configure un proxy qui redirige <code>/api/clients</code> vers <code>http://localhost:3004</code> en developpement. Cela evite les problemes CORS.</p>
+</div>
+
+<!-- Env -->
+<div class="card" id="env">
+  <h2>&#x2699;&#xfe0f; Configuration</h2>
+  <h3>Variables d'environnement</h3>
+  <table>
+    <thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td><code>VITE_API_URL</code></td><td><code>http://localhost:3004</code></td><td>URL de base de l'API backend</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top: 1rem;">Creer un fichier <code>.env</code> a la racine pour surcharger :</p>
+  <pre><code>VITE_API_URL=http://localhost:3004</code></pre>
+
+  <h3>Theme couleurs (Tailwind)</h3>
+  <p>Les couleurs primaires sont definies dans <code>src/index.css</code> via <code>@theme</code> :</p>
+  <pre><code>@theme {
+  --color-primary-500: #3b82f6;  /* Bleu principal */
+  --color-primary-600: #2563eb;  /* Hover / actif */
+  --color-primary-700: #1d4ed8;  /* Pressed */
+}</code></pre>
+</div>
+
+<div style="text-align: center; padding: 2rem; color: #94a3b8; font-size: 0.85rem;">
+  CRM Clients Frontend &mdash; React + TypeScript + Vite + Tailwind + Zustand
+</div>
+
+</div>
+</body>
+</html>

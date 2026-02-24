@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx prisma db push:*)",
+      "Bash(npm run db:seed:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run build:*)",
+      "Bash(tr:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx vite build)",
+      "Bash(grep \"shadow-black\" dist/assets/index-*.css)",
+      "Bash(grep \"k-surface-2\" dist/assets/index-*.css)",
+      "Bash(grep:*)",
+      "Bash(node -e:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(npx prisma migrate dev:*)",
+      "Bash(find:*)"
+    ]
+  }
+}

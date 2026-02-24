@@ -12,6 +12,7 @@ import { clientService } from '@/services/clientService';
 import { formatDate, formatDateTime, formatCurrency } from '@/lib/utils';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import RichTextEditor, { type RichTextEditorRef } from '@/components/common/RichTextEditor';
+import FloatingTooltip from '@/components/common/FloatingTooltip';
 import type { ClientComment, DevisRef } from '@/types/client';
 
 type Tab = 'devis' | 'factures' | 'avoirs' | 'reglements' | 'opportunities' | 'contacts' | 'retard';
@@ -322,7 +323,7 @@ export default function ClientDetailPage() {
                     </div>
 
                     {/* Devis list table */}
-                    <div className="overflow-x-auto overflow-y-visible">
+                    <div className="overflow-x-auto">
                       <table className="min-w-full text-[13px]">
                         <thead>
                           <tr className="border-b border-[--k-border]">
@@ -341,14 +342,13 @@ export default function ClientDetailPage() {
                             return (
                               <tr key={d.id} className="border-t border-[--k-border] hover:bg-[--k-surface-2] transition-colors">
                                 <td className="px-3 py-2 font-medium text-[--k-primary]">
-                                  <span className="group/devis relative cursor-default">
-                                    {d.indent || `#${d.id}`}
-                                    {objetText && (
-                                      <span className="pointer-events-none absolute left-0 bottom-full z-50 mb-1 hidden max-w-sm rounded-lg bg-slate-900 px-3 py-2 text-[12px] font-normal leading-relaxed text-white shadow-lg group-hover/devis:block">
-                                        {objetText}
-                                      </span>
-                                    )}
-                                  </span>
+                                  {objetText ? (
+                                    <FloatingTooltip content={objetText}>
+                                      {d.indent || `#${d.id}`}
+                                    </FloatingTooltip>
+                                  ) : (
+                                    d.indent || `#${d.id}`
+                                  )}
                                 </td>
                                 <td className="px-3 py-2 text-[--k-muted]">{d.dateCreation ? formatDate(d.dateCreation) : '--'}</td>
                                 <td className="px-3 py-2 text-right font-medium text-[--k-text]">{d.totalHt ? formatCurrency(d.totalHt) : '--'}</td>

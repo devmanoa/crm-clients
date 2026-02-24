@@ -322,7 +322,7 @@ export default function ClientDetailPage() {
                     </div>
 
                     {/* Devis list table */}
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto overflow-y-visible">
                       <table className="min-w-full text-[13px]">
                         <thead>
                           <tr className="border-b border-[--k-border]">
@@ -344,7 +344,7 @@ export default function ClientDetailPage() {
                                   <span className="group/devis relative cursor-default">
                                     {d.indent || `#${d.id}`}
                                     {objetText && (
-                                      <span className="pointer-events-none absolute left-0 top-full z-50 mt-1 hidden max-w-xs rounded-lg bg-slate-900 px-3 py-2 text-[12px] font-normal text-white shadow-lg group-hover/devis:block">
+                                      <span className="pointer-events-none absolute left-0 bottom-full z-50 mb-1 hidden max-w-sm rounded-lg bg-slate-900 px-3 py-2 text-[12px] font-normal leading-relaxed text-white shadow-lg group-hover/devis:block">
                                         {objetText}
                                       </span>
                                     )}

@@ -14,6 +14,7 @@ interface User {
 interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
+  authError: string | null;
   user: User | null;
   token: string | null;
   login: () => void;
@@ -45,7 +46,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const [authError, setAuthError] = useState<string | null>(null);
+
   useEffect(() => {
+    let tokenRefreshInterval: ReturnType<typeof setInterval>;
+
     const initKeycloak = async () => {
       try {
         const authenticated = await keycloak.init({
@@ -59,8 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (authenticated) {
           updateUserInfo();
 
-          // Setup token refresh
-          setInterval(async () => {
+          tokenRefreshInterval = setInterval(async () => {
             if (keycloak.authenticated) {
               try {
                 const refreshed = await keycloak.updateToken(70);
@@ -77,12 +81,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error('Keycloak initialization failed:', error);
         setIsAuthenticated(false);
+        setAuthError('Erreur de connexion au serveur d\'authentification.');
       } finally {
         setIsLoading(false);
       }
     };
 
     initKeycloak();
+
+    return () => {
+      if (tokenRefreshInterval) clearInterval(tokenRefreshInterval);
+    };
   }, [updateUserInfo]);
 
   const login = useCallback(() => {
@@ -101,6 +110,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={{
       isAuthenticated,
       isLoading,
+      authError,
       user,
       token,
       login,

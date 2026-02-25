@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
-  Pencil, Trash2, Building2, User, Phone, Mail, MapPin,
+  Pencil, Trash2, Phone, Mail, MapPin,
   Globe, Tag, Target, Send, Loader2, ChevronDown, ChevronUp,
   StickyNote, FileText, CheckSquare, MoreVertical,
   CheckCircle, Clock, XCircle, Receipt, CreditCard, AlertTriangle,
@@ -35,6 +35,7 @@ export default function ClientDetailPage() {
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [comments, setComments] = useState<ClientComment[]>([]);
   const [activityFilter, setActivityFilter] = useState<'all' | 'comments' | 'actions'>('all');
+  const [pdfDevisId, setPdfDevisId] = useState<string | null>(null);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -134,14 +135,6 @@ export default function ClientDetailPage() {
             {/* Title row */}
             <div className="flex items-start justify-between flex-wrap gap-3">
               <div className="flex items-start gap-3 flex-1 min-w-0">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-                  client.client_type === 'corporation' ? 'bg-blue-50' : 'bg-emerald-50'
-                }`}>
-                  {client.client_type === 'corporation'
-                    ? <Building2 className="w-5 h-5 text-blue-600" />
-                    : <User className="w-5 h-5 text-emerald-600" />
-                  }
-                </div>
                 <div className="min-w-0">
                   <h1 className="text-xl font-bold text-[--k-text] flex items-center gap-2 flex-wrap">
                     {clientName}
@@ -281,9 +274,7 @@ export default function ClientDetailPage() {
                   className={`flex items-center gap-1.5 px-4 py-1.5 text-[13px] font-medium rounded-lg transition ${
                     activeTab === tab.key
                       ? 'bg-[--k-primary] text-white'
-                      : tab.count > 0
-                        ? 'bg-[--k-primary] text-white'
-                        : 'bg-[--k-surface-2] text-[--k-text] hover:brightness-95'
+                      : 'bg-[--k-surface-2] text-[--k-text] hover:brightness-95'
                   }`}
                 >
                   {tab.icon}
@@ -332,6 +323,7 @@ export default function ClientDetailPage() {
                             <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Montant HT</th>
                             <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Montant TTC</th>
                             <th className="px-3 py-2 text-center text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Statut</th>
+                            <th className="px-3 py-2 text-center text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Actions</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -339,15 +331,26 @@ export default function ClientDetailPage() {
                             const st = DEVIS_STATUS_LABELS[d.status] || DEVIS_STATUS_LABELS.brouillon;
                             // Strip HTML tags from objet for tooltip
                             const objetText = d.objet ? d.objet.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
+                            const crmUrl = import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr';
                             return (
                               <tr key={d.id} className="border-t border-[--k-border] hover:bg-[--k-surface-2] transition-colors">
                                 <td className="px-3 py-2 font-medium text-[--k-primary]">
                                   {objetText ? (
                                     <FloatingTooltip content={objetText}>
-                                      {d.indent || `#${d.id}`}
+                                      <button
+                                        onClick={() => d.idDevisCrm && setPdfDevisId(d.idDevisCrm)}
+                                        className="hover:underline cursor-pointer"
+                                      >
+                                        {d.indent || `#${d.id}`}
+                                      </button>
                                     </FloatingTooltip>
                                   ) : (
-                                    d.indent || `#${d.id}`
+                                    <button
+                                      onClick={() => d.idDevisCrm && setPdfDevisId(d.idDevisCrm)}
+                                      className="hover:underline cursor-pointer"
+                                    >
+                                      {d.indent || `#${d.id}`}
+                                    </button>
                                   )}
                                 </td>
                                 <td className="px-3 py-2 text-[--k-muted]">{d.dateCreation ? formatDate(d.dateCreation) : '--'}</td>
@@ -357,6 +360,33 @@ export default function ClientDetailPage() {
                                   <span className={`inline-flex px-2 py-0.5 text-[11px] font-semibold rounded-full ${st.bg} ${st.color}`}>
                                     {st.label}
                                   </span>
+                                </td>
+                                <td className="px-3 py-2 text-center">
+                                  {d.idDevisCrm && (
+                                    <div className="relative group/actions">
+                                      <button className="p-1 text-[--k-muted] hover:text-[--k-text] hover:bg-[--k-surface-2] rounded-lg transition">
+                                        <MoreVertical className="w-4 h-4" />
+                                      </button>
+                                      <div className="hidden group-hover/actions:block absolute right-0 z-20 mt-1 w-44 bg-[--k-surface] rounded-xl border border-[--k-border] shadow-lg py-1">
+                                        <a
+                                          href={`${crmUrl}/fr/devis/add/${d.idDevisCrm}`}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="flex items-center gap-2 px-3 py-2 text-[13px] text-[--k-text] hover:bg-[--k-surface-2] transition"
+                                        >
+                                          <Pencil className="w-3.5 h-3.5" />
+                                          Éditer
+                                        </a>
+                                        <button
+                                          onClick={() => setPdfDevisId(d.idDevisCrm!)}
+                                          className="flex w-full items-center gap-2 px-3 py-2 text-[13px] text-[--k-text] hover:bg-[--k-surface-2] transition"
+                                        >
+                                          <FileText className="w-3.5 h-3.5" />
+                                          Voir le document
+                                        </button>
+                                      </div>
+                                    </div>
+                                  )}
                                 </td>
                               </tr>
                             );
@@ -786,6 +816,34 @@ export default function ClientDetailPage() {
           )}
         </div>
       </div>
+
+      {/* PDF Devis Modal */}
+      {pdfDevisId && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={() => setPdfDevisId(null)}
+        >
+          <div
+            className="relative w-[90vw] h-[85vh] max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
+              <h3 className="text-[14px] font-semibold text-gray-800">Devis PDF</h3>
+              <button
+                onClick={() => setPdfDevisId(null)}
+                className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+            <iframe
+              src={`${import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr'}/fr/devis/pdfversion/${pdfDevisId}`}
+              className="w-full h-[calc(100%-52px)]"
+              title="Devis PDF"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

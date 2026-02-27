@@ -13,6 +13,7 @@ import { formatDate, formatDateTime, formatCurrency } from '@/lib/utils';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import RichTextEditor, { type RichTextEditorRef } from '@/components/common/RichTextEditor';
 import FloatingTooltip from '@/components/common/FloatingTooltip';
+import CreateDevisModal from '@/components/devis/CreateDevisModal';
 import type { ClientComment, DevisRef } from '@/types/client';
 
 type Tab = 'devis' | 'factures' | 'avoirs' | 'reglements' | 'opportunities' | 'contacts' | 'retard';
@@ -36,6 +37,7 @@ export default function ClientDetailPage() {
   const [comments, setComments] = useState<ClientComment[]>([]);
   const [activityFilter, setActivityFilter] = useState<'all' | 'comments' | 'actions'>('all');
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+  const [showCreateDevis, setShowCreateDevis] = useState(false);
 
   const crmBaseUrl = import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr';
 
@@ -161,7 +163,7 @@ export default function ClientDetailPage() {
                   Ajouter une note
                 </button>
                 <button
-                  onClick={() => openCrmPopup(`${crmBaseUrl}/fr/clients/fiche/${client.idClientCrm || client.id}`, 'ficheClientCrm')}
+                  onClick={() => setShowCreateDevis(true)}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-[--k-text] bg-[--k-surface-2] border border-[--k-border] rounded-lg hover:brightness-95 transition"
                 >
                   <FileText className="w-3.5 h-3.5" />
@@ -302,7 +304,7 @@ export default function ClientDetailPage() {
                 <div className="flex items-center justify-between mb-3">
                   <button onClick={() => setActiveTab(null)} className="text-[12px] text-[--k-primary] hover:underline">Fermer</button>
                   <button
-                    onClick={() => openCrmPopup(`${crmBaseUrl}/fr/clients/fiche/${client.idClientCrm || client.id}`, 'ficheClientCrm')}
+                    onClick={() => setShowCreateDevis(true)}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium bg-[--k-primary] text-white rounded-lg hover:brightness-110 transition"
                   >
                     <FileText className="w-3.5 h-3.5" />
@@ -838,6 +840,12 @@ export default function ClientDetailPage() {
         </div>
       </div>
 
+      <CreateDevisModal
+        isOpen={showCreateDevis}
+        clientId={client.idClientCrm || client.id}
+        clientNom={client.nom}
+        onClose={() => setShowCreateDevis(false)}
+      />
     </div>
   );
 }

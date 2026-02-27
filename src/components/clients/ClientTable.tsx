@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Eye, Pencil, Trash2, ArrowUpDown, Building2, User } from 'lucide-react';
+import { Eye, Pencil, Trash2, ArrowUpDown } from 'lucide-react';
 import { useClientStore } from '@/stores/clientStore';
 import { formatDate } from '@/lib/utils';
 import type { Client } from '@/types/client';
@@ -81,21 +81,11 @@ export default function ClientTable() {
                   />
                 </td>
                 <td className="px-4 py-1.5">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-                      client.client_type === 'corporation' ? 'bg-blue-50' : 'bg-emerald-50'
-                    }`}>
-                      {client.client_type === 'corporation'
-                        ? <Building2 className="w-3.5 h-3.5 text-blue-600" />
-                        : <User className="w-3.5 h-3.5 text-emerald-600" />
-                      }
-                    </div>
-                    <div>
-                      <p className="font-medium text-[--k-text]">{getClientName(client)}</p>
-                      {client.telephone && (
-                        <p className="text-[11px] text-[--k-muted]">{client.telephone}</p>
-                      )}
-                    </div>
+                  <div>
+                    <p className="font-medium text-[--k-text]">{getClientName(client)}</p>
+                    {client.telephone && (
+                      <p className="text-[11px] text-[--k-muted]">{client.telephone}</p>
+                    )}
                   </div>
                 </td>
                 <td className="px-4 py-1.5">

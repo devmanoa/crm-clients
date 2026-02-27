@@ -36,6 +36,7 @@ export default function ClientDetailPage() {
   const [comments, setComments] = useState<ClientComment[]>([]);
   const [activityFilter, setActivityFilter] = useState<'all' | 'comments' | 'actions'>('all');
   const [pdfDevisId, setPdfDevisId] = useState<string | null>(null);
+  const [showCreateDevis, setShowCreateDevis] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
@@ -289,17 +290,13 @@ export default function ClientDetailPage() {
               <div className="mt-4">
                 <div className="flex items-center justify-between mb-3">
                   <button onClick={() => setActiveTab(null)} className="text-[12px] text-[--k-primary] hover:underline">Fermer</button>
-                  {client.idClientCrm && (
-                    <a
-                      href={`${import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr'}/fr/devis/add?client_id=${client.idClientCrm}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium bg-[--k-primary] text-white rounded-lg hover:brightness-110 transition"
-                    >
-                      <FileText className="w-3.5 h-3.5" />
-                      Créer un devis
-                    </a>
-                  )}
+                  <button
+                    onClick={() => setShowCreateDevis(true)}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium bg-[--k-primary] text-white rounded-lg hover:brightness-110 transition"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    Créer un devis
+                  </button>
                 </div>
 
                 {/* Devis summary */}
@@ -853,6 +850,34 @@ export default function ClientDetailPage() {
               src={`${import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr'}/fr/devis/pdfversion/${pdfDevisId}`}
               className="w-full h-[calc(100%-52px)]"
               title="Devis PDF"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Création Devis Modal */}
+      {showCreateDevis && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          onClick={() => setShowCreateDevis(false)}
+        >
+          <div
+            className="relative w-[90vw] h-[85vh] max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
+              <h3 className="text-[14px] font-semibold text-gray-800">Création devis</h3>
+              <button
+                onClick={() => setShowCreateDevis(false)}
+                className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+            <iframe
+              src={`${import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr'}/fr/clients/modalCreationDoc/${client.idClientCrm || client.id}/Devis`}
+              className="w-full h-[calc(100%-52px)]"
+              title="Création devis"
             />
           </div>
         </div>

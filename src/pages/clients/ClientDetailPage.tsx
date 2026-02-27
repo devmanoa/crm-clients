@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Pencil, Trash2, Phone, Mail, MapPin,
@@ -36,9 +35,17 @@ export default function ClientDetailPage() {
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [comments, setComments] = useState<ClientComment[]>([]);
   const [activityFilter, setActivityFilter] = useState<'all' | 'comments' | 'actions'>('all');
-  const [pdfDevisId, setPdfDevisId] = useState<string | null>(null);
-  const [showCreateDevis, setShowCreateDevis] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+
+  const crmBaseUrl = import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr';
+
+  const openCrmPopup = (url: string, name: string) => {
+    const w = Math.min(1200, window.screen.width - 100);
+    const h = Math.min(800, window.screen.height - 100);
+    const left = (window.screen.width - w) / 2;
+    const top = (window.screen.height - h) / 2;
+    window.open(url, name, `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+  };
 
   useEffect(() => {
     if (id) fetchClientById(parseInt(id));
@@ -154,7 +161,7 @@ export default function ClientDetailPage() {
                   Ajouter une note
                 </button>
                 <button
-                  onClick={() => setShowCreateDevis(true)}
+                  onClick={() => openCrmPopup(`${crmBaseUrl}/fr/clients/modalCreationDoc/${client.idClientCrm || client.id}/Devis`, 'creerDevis')}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-[--k-text] bg-[--k-surface-2] border border-[--k-border] rounded-lg hover:brightness-95 transition"
                 >
                   <FileText className="w-3.5 h-3.5" />
@@ -295,7 +302,7 @@ export default function ClientDetailPage() {
                 <div className="flex items-center justify-between mb-3">
                   <button onClick={() => setActiveTab(null)} className="text-[12px] text-[--k-primary] hover:underline">Fermer</button>
                   <button
-                    onClick={() => setShowCreateDevis(true)}
+                    onClick={() => openCrmPopup(`${crmBaseUrl}/fr/clients/modalCreationDoc/${client.idClientCrm || client.id}/Devis`, 'creerDevis')}
                     className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium bg-[--k-primary] text-white rounded-lg hover:brightness-110 transition"
                   >
                     <FileText className="w-3.5 h-3.5" />
@@ -345,14 +352,14 @@ export default function ClientDetailPage() {
                             const st = DEVIS_STATUS_LABELS[d.status] || DEVIS_STATUS_LABELS.brouillon;
                             // Strip HTML tags from objet for tooltip
                             const objetText = d.objet ? d.objet.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : '';
-                            const crmUrl = import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr';
+                            const crmUrl = crmBaseUrl;
                             return (
                               <tr key={d.id} className="border-t border-[--k-border] hover:bg-[--k-surface-2] transition-colors">
                                 <td className="px-3 py-2 font-medium text-[--k-primary]">
                                   {objetText ? (
                                     <FloatingTooltip content={objetText}>
                                       <button
-                                        onClick={() => d.idDevisCrm && setPdfDevisId(d.idDevisCrm)}
+                                        onClick={() => d.idDevisCrm && openCrmPopup(`${crmBaseUrl}/fr/devis/pdfversion/${d.idDevisCrm}`, `pdfDevis_${d.idDevisCrm}`)}
                                         className="hover:underline cursor-pointer"
                                       >
                                         {d.indent || `#${d.id}`}
@@ -360,7 +367,7 @@ export default function ClientDetailPage() {
                                     </FloatingTooltip>
                                   ) : (
                                     <button
-                                      onClick={() => d.idDevisCrm && setPdfDevisId(d.idDevisCrm)}
+                                      onClick={() => d.idDevisCrm && openCrmPopup(`${crmBaseUrl}/fr/devis/pdfversion/${d.idDevisCrm}`, `pdfDevis_${d.idDevisCrm}`)}
                                       className="hover:underline cursor-pointer"
                                     >
                                       {d.indent || `#${d.id}`}
@@ -392,7 +399,7 @@ export default function ClientDetailPage() {
                                           Éditer
                                         </a>
                                         <button
-                                          onClick={() => setPdfDevisId(d.idDevisCrm!)}
+                                          onClick={() => openCrmPopup(`${crmBaseUrl}/fr/devis/pdfversion/${d.idDevisCrm}`, `pdfDevis_${d.idDevisCrm}`)}
                                           className="flex w-full items-center gap-2 px-3 py-2 text-[13px] text-[--k-text] hover:bg-[--k-surface-2] transition"
                                         >
                                           <FileText className="w-3.5 h-3.5" />
@@ -831,63 +838,6 @@ export default function ClientDetailPage() {
         </div>
       </div>
 
-      {/* PDF Devis Modal */}
-      {pdfDevisId && createPortal(
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
-          onClick={() => setPdfDevisId(null)}
-        >
-          <div
-            className="relative w-[90vw] h-[85vh] max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
-              <h3 className="text-[14px] font-semibold text-gray-800">Devis PDF</h3>
-              <button
-                onClick={() => setPdfDevisId(null)}
-                className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition"
-              >
-                <XCircle className="w-5 h-5" />
-              </button>
-            </div>
-            <iframe
-              src={`${import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr'}/fr/devis/pdfversion/${pdfDevisId}`}
-              className="w-full h-[calc(100%-52px)]"
-              title="Devis PDF"
-            />
-          </div>
-        </div>,
-        document.body,
-      )}
-
-      {/* Création Devis Modal */}
-      {showCreateDevis && createPortal(
-        <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
-          onClick={() => setShowCreateDevis(false)}
-        >
-          <div
-            className="relative w-[90vw] h-[85vh] max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between px-5 py-3 border-b border-gray-200">
-              <h3 className="text-[14px] font-semibold text-gray-800">Création devis</h3>
-              <button
-                onClick={() => setShowCreateDevis(false)}
-                className="p-1.5 text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition"
-              >
-                <XCircle className="w-5 h-5" />
-              </button>
-            </div>
-            <iframe
-              src={`${import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr'}/fr/clients/modalCreationDoc/${client.idClientCrm || client.id}/Devis`}
-              className="w-full h-[calc(100%-52px)]"
-              title="Création devis"
-            />
-          </div>
-        </div>,
-        document.body,
-      )}
     </div>
   );
 }

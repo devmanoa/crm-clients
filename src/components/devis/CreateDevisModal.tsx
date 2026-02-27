@@ -112,7 +112,6 @@ interface CreateDevisModalProps {
 
 export default function CreateDevisModal({ isOpen, clientId, clientNom, onClose }: CreateDevisModalProps) {
   const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<DevisCreationData | null>(null);
 
@@ -184,32 +183,21 @@ export default function CreateDevisModal({ isOpen, clientId, clientNom, onClose 
     setSelectedModelDevisId('');
   }, [selectedSousCategoryId]);
 
-  const handleSubmit = async () => {
-    setSubmitting(true);
-    setError(null);
-    try {
-      const result = await crmService.createDevis({
-        client_id: clientId,
-        model_devis_id: selectedModelDevisId || null,
-        categorie_tarifaire: categorieTarifaire,
-        type_doc_id: typeDocId || null,
-      });
+  const handleSubmit = () => {
+    const crmBaseUrl = import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr';
+    const params = new URLSearchParams();
+    params.set('client_id', String(clientId));
+    if (selectedModelDevisId) params.set('model_devis_id', String(selectedModelDevisId));
+    if (categorieTarifaire) params.set('categorie_tarifaire', categorieTarifaire);
+    if (typeDocId) params.set('type_doc_id', String(typeDocId));
 
-      if (result.success && result.editUrl) {
-        const crmBaseUrl = import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr';
-        const fullUrl = crmBaseUrl + result.editUrl;
-        const w = Math.min(1200, window.screen.width - 100);
-        const h = Math.min(800, window.screen.height - 100);
-        const left = (window.screen.width - w) / 2;
-        const top = (window.screen.height - h) / 2;
-        window.open(fullUrl, 'devisEditor', `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`);
-        onClose();
-      }
-    } catch {
-      setError('Erreur lors de la création du devis.');
-    } finally {
-      setSubmitting(false);
-    }
+    const url = `${crmBaseUrl}/fr/devis/add?${params.toString()}`;
+    const w = Math.min(1200, window.screen.width - 100);
+    const h = Math.min(800, window.screen.height - 100);
+    const left = (window.screen.width - w) / 2;
+    const top = (window.screen.height - h) / 2;
+    window.open(url, 'devisEditor', `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+    onClose();
   };
 
   if (!isOpen) return null;
@@ -370,10 +358,8 @@ export default function CreateDevisModal({ isOpen, clientId, clientNom, onClose 
             </button>
             <button
               onClick={handleSubmit}
-              disabled={submitting}
-              className="px-5 py-2 text-sm font-medium text-white bg-[var(--k-primary)] rounded-xl hover:brightness-110 transition disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2 text-sm font-medium text-white bg-[var(--k-primary)] rounded-xl hover:brightness-110 transition flex items-center gap-2"
             >
-              {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
               Créer le devis
             </button>
           </div>

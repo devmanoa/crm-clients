@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
   Pencil, Trash2, Phone, Mail, MapPin,
@@ -152,7 +153,10 @@ export default function ClientDetailPage() {
                   <StickyNote className="w-3.5 h-3.5" />
                   Ajouter une note
                 </button>
-                <button className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-[--k-text] bg-[--k-surface-2] border border-[--k-border] rounded-lg hover:brightness-95 transition">
+                <button
+                  onClick={() => setShowCreateDevis(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-[--k-text] bg-[--k-surface-2] border border-[--k-border] rounded-lg hover:brightness-95 transition"
+                >
                   <FileText className="w-3.5 h-3.5" />
                   Créer un devis
                 </button>
@@ -828,9 +832,9 @@ export default function ClientDetailPage() {
       </div>
 
       {/* PDF Devis Modal */}
-      {pdfDevisId && (
+      {pdfDevisId && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
           onClick={() => setPdfDevisId(null)}
         >
           <div
@@ -852,13 +856,14 @@ export default function ClientDetailPage() {
               title="Devis PDF"
             />
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
 
       {/* Création Devis Modal */}
-      {showCreateDevis && (
+      {showCreateDevis && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50"
           onClick={() => setShowCreateDevis(false)}
         >
           <div
@@ -880,7 +885,8 @@ export default function ClientDetailPage() {
               title="Création devis"
             />
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

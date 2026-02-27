@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { X, FileText, Loader2 } from 'lucide-react';
+// Modal natif pour la création de devis via API CRM
 import { crmService, type DevisCreationData } from '../../services/crmService';
 
 interface CreateDevisModalProps {

@@ -70,7 +70,7 @@ const SIDEBAR_SECTIONS = [
 
 // ── Layout ───────────────────────────────────────────────────────
 export default function AppLayout() {
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -104,7 +104,7 @@ export default function AppLayout() {
 
   // Props depend on whether we're rendering remote or local
   const headerProps = isRemoteHeader
-    ? { user: headerUser, onLogout: logout, currentAppName: 'CRM Clients', onNavigate: handleNavigate }
+    ? { user: headerUser, onLogout: logout, currentAppName: 'CRM Clients', onNavigate: handleNavigate, authToken: token }
     : { onToggleMobileMenu: () => setMobileMenuOpen((v) => !v) };
 
   const sidebarProps = isRemoteSidebar

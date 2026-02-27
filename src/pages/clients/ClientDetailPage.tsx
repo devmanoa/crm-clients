@@ -287,7 +287,20 @@ export default function ClientDetailPage() {
             {/* ---- Devis Tab ---- */}
             {activeTab === 'devis' && (
               <div className="mt-4">
-                <button onClick={() => setActiveTab(null)} className="text-[12px] text-[--k-primary] hover:underline mb-3 block">Fermer</button>
+                <div className="flex items-center justify-between mb-3">
+                  <button onClick={() => setActiveTab(null)} className="text-[12px] text-[--k-primary] hover:underline">Fermer</button>
+                  {client.idClientCrm && (
+                    <a
+                      href={`${import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr'}/fr/devis/add?client_id=${client.idClientCrm}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium bg-[--k-primary] text-white rounded-lg hover:brightness-110 transition"
+                    >
+                      <FileText className="w-3.5 h-3.5" />
+                      Créer un devis
+                    </a>
+                  )}
+                </div>
 
                 {/* Devis summary */}
                 {devisRefs.length > 0 ? (

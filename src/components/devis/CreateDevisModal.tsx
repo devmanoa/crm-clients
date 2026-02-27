@@ -187,16 +187,12 @@ export default function CreateDevisModal({ isOpen, clientId, clientNom, onClose 
     const crmBaseUrl = import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr';
     const params = new URLSearchParams();
     params.set('client_id', String(clientId));
-    if (selectedModelDevisId) params.set('model_devis_id', String(selectedModelDevisId));
+    if (selectedModelDevisId) params.set('devis_id', String(selectedModelDevisId));
     if (categorieTarifaire) params.set('categorie_tarifaire', categorieTarifaire);
     if (typeDocId) params.set('type_doc_id', String(typeDocId));
 
     const url = `${crmBaseUrl}/fr/devis/add?${params.toString()}`;
-    const w = Math.min(1200, window.screen.width - 100);
-    const h = Math.min(800, window.screen.height - 100);
-    const left = (window.screen.width - w) / 2;
-    const top = (window.screen.height - h) / 2;
-    window.open(url, 'devisEditor', `width=${w},height=${h},left=${left},top=${top},resizable=yes,scrollbars=yes`);
+    window.open(url, '_blank');
     onClose();
   };
 

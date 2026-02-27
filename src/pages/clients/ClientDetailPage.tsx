@@ -842,7 +842,7 @@ export default function ClientDetailPage() {
 
       <CreateDevisModal
         isOpen={showCreateDevis}
-        clientId={client.idClientCrm || client.id}
+        clientId={Number(client.idClientCrm) || client.id}
         clientNom={client.nom}
         onClose={() => setShowCreateDevis(false)}
       />

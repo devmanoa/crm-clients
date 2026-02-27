@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, Component } from 'react';
+import React, { Suspense, useState, useEffect, Component } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { List, UserPlus, BarChart3, GitBranch, Copy } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -6,31 +6,20 @@ import { loadRemoteComponent } from '../../remoteLoader';
 import Topbar from './Topbar';
 import Sidebar from './Sidebar';
 
-// ── Hook: try remote, fallback to local ──────────────────────────
-function useRemoteComponent(
-  remoteName: string,
-  LocalFallback: React.ComponentType<any>,
-): { Component: React.ComponentType<any>; isRemote: boolean } {
-  const [RemoteComp, setRemoteComp] = useState<React.ComponentType<any> | null>(null);
-  const [failed, setFailed] = useState(false);
-  const tried = useRef(false);
+// Lazy-load remote components
+const RemoteHeaderBar = React.lazy(() => loadRemoteComponent('./HeaderBar'));
+const RemoteSidebar = React.lazy(() => loadRemoteComponent('./Sidebar'));
 
-  useEffect(() => {
-    if (tried.current) return;
-    tried.current = true;
-
-    loadRemoteComponent(remoteName)
-      .then((mod) => setRemoteComp(() => mod.default))
-      .catch(() => setFailed(true));
-  }, [remoteName]);
-
-  if (failed || !RemoteComp) {
-    return { Component: failed ? LocalFallback : LocalFallback, isRemote: false };
-  }
-  return { Component: RemoteComp, isRemote: true };
+// ── Placeholders ────────────────────────────────────────────────
+function HeaderFallback() {
+  return <div className="h-12 shrink-0 border-b border-[--k-border] bg-gradient-to-r from-white to-blue-50" />;
 }
 
-// ── Error boundary (catches render errors from remote) ───────────
+function SidebarFallback() {
+  return <div className="w-[210px] shrink-0 bg-[--k-sidebar-bg] h-full" />;
+}
+
+// ── Error boundary ──────────────────────────────────────────────
 interface EBProps { fallback: React.ReactNode; children: React.ReactNode }
 interface EBState { hasError: boolean }
 
@@ -47,7 +36,7 @@ class RemoteErrorBoundary extends Component<EBProps, EBState> {
   }
 }
 
-// ── Sidebar config ───────────────────────────────────────────────
+// ── Sidebar config ──────────────────────────────────────────────
 const SIDEBAR_SECTIONS = [
   {
     label: 'Clients',
@@ -68,9 +57,9 @@ const SIDEBAR_SECTIONS = [
   },
 ];
 
-// ── Layout ───────────────────────────────────────────────────────
+// ── Layout ──────────────────────────────────────────────────────
 export default function AppLayout() {
-  const { user, logout, token } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -87,10 +76,6 @@ export default function AppLayout() {
 
   useEffect(() => { setMobileMenuOpen(false); }, [location.pathname]);
 
-  // Remote components (fallback to local if unavailable)
-  const { Component: HeaderBar, isRemote: isRemoteHeader } = useRemoteComponent('./HeaderBar', Topbar);
-  const { Component: SidebarComp, isRemote: isRemoteSidebar } = useRemoteComponent('./Sidebar', Sidebar);
-
   const handleNavigate = (path: string) => navigate(path);
 
   const headerUser = user
@@ -102,31 +87,46 @@ export default function AppLayout() {
       }
     : null;
 
-  // Props depend on whether we're rendering remote or local
-  const headerProps = isRemoteHeader
-    ? { user: headerUser, onLogout: logout, currentAppName: 'CRM Clients', onNavigate: handleNavigate, authToken: token }
-    : { onToggleMobileMenu: () => setMobileMenuOpen((v) => !v) };
+  const localTopbar = (
+    <Topbar onToggleMobileMenu={() => setMobileMenuOpen((v) => !v)} />
+  );
 
-  const sidebarProps = isRemoteSidebar
-    ? { sections: SIDEBAR_SECTIONS, activePath: location.pathname, onNavigate: handleNavigate, collapsed: sidebarCollapsed, onCollapse: () => setSidebarCollapsed((v) => !v), onHelpClick: () => {} }
-    : { collapsed: sidebarCollapsed, onToggle: () => setSidebarCollapsed((v) => !v) };
+  const localSidebar = (
+    <Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((v) => !v)} />
+  );
 
-  const mobileSidebarProps = isRemoteSidebar
-    ? { sections: SIDEBAR_SECTIONS, activePath: location.pathname, onNavigate: handleNavigate, collapsed: false, onCollapse: () => setMobileMenuOpen(false), onHelpClick: () => {} }
-    : { collapsed: false, onToggle: () => setMobileMenuOpen(false) };
+  const localMobileSidebar = (
+    <Sidebar collapsed={false} onToggle={() => setMobileMenuOpen(false)} />
+  );
 
   return (
     <div className="h-screen flex flex-col bg-[--k-bg]">
-      {/* Header */}
-      <RemoteErrorBoundary fallback={<Topbar onToggleMobileMenu={() => setMobileMenuOpen((v) => !v)} />}>
-        <HeaderBar {...headerProps} />
+      {/* Header — remote with local fallback */}
+      <RemoteErrorBoundary fallback={localTopbar}>
+        <Suspense fallback={<HeaderFallback />}>
+          <RemoteHeaderBar
+            user={headerUser}
+            onLogout={logout}
+            currentAppName="CRM Clients"
+            onNavigate={handleNavigate}
+          />
+        </Suspense>
       </RemoteErrorBoundary>
 
       <div className="flex flex-1 min-h-0">
         {/* Desktop sidebar */}
         <div className="hidden md:block">
-          <RemoteErrorBoundary fallback={<Sidebar collapsed={sidebarCollapsed} onToggle={() => setSidebarCollapsed((v) => !v)} />}>
-            <SidebarComp {...sidebarProps} />
+          <RemoteErrorBoundary fallback={localSidebar}>
+            <Suspense fallback={<SidebarFallback />}>
+              <RemoteSidebar
+                sections={SIDEBAR_SECTIONS}
+                activePath={location.pathname}
+                onNavigate={handleNavigate}
+                collapsed={sidebarCollapsed}
+                onCollapse={() => setSidebarCollapsed((v) => !v)}
+                onHelpClick={() => {}}
+              />
+            </Suspense>
           </RemoteErrorBoundary>
         </div>
 
@@ -135,8 +135,17 @@ export default function AppLayout() {
           <>
             <div className="fixed inset-0 z-30 bg-black/30 md:hidden" onClick={() => setMobileMenuOpen(false)} />
             <div className="fixed left-0 top-12 z-40 h-[calc(100vh-48px)] md:hidden">
-              <RemoteErrorBoundary fallback={<Sidebar collapsed={false} onToggle={() => setMobileMenuOpen(false)} />}>
-                <SidebarComp {...mobileSidebarProps} />
+              <RemoteErrorBoundary fallback={localMobileSidebar}>
+                <Suspense fallback={<SidebarFallback />}>
+                  <RemoteSidebar
+                    sections={SIDEBAR_SECTIONS}
+                    activePath={location.pathname}
+                    onNavigate={handleNavigate}
+                    collapsed={false}
+                    onCollapse={() => setMobileMenuOpen(false)}
+                    onHelpClick={() => {}}
+                  />
+                </Suspense>
               </RemoteErrorBoundary>
             </div>
           </>

@@ -14,7 +14,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import RichTextEditor, { type RichTextEditorRef } from '@/components/common/RichTextEditor';
 import FloatingTooltip from '@/components/common/FloatingTooltip';
 import CreateDevisModal from '@/components/devis/CreateDevisModal';
-import type { ClientComment, DevisRef, FactureRef, ReglementRef } from '@/types/client';
+import type { ClientComment, DevisRef, FactureRef, AvoirRef, ReglementRef } from '@/types/client';
 
 type Tab = 'devis' | 'factures' | 'avoirs' | 'reglements' | 'opportunities' | 'contacts' | 'retard';
 
@@ -132,6 +132,10 @@ export default function ClientDetailPage() {
   const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(f.totalTtc) || 0), 0);
   const sumFactureRestant = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(f.restantDu) || 0), 0);
 
+  // Avoirs stats
+  const avoirRefs = client.avoirRefs || [];
+  const sumAvoirTtc = (list: AvoirRef[]) => list.reduce((s, a) => s + (Number(a.totalTtc) || 0), 0);
+
   // Reglements stats
   const reglementRefs = client.reglementRefs || [];
   const regCredits = reglementRefs.filter(r => r.type === 'C');
@@ -142,7 +146,7 @@ export default function ClientDetailPage() {
   const tabDefs: { key: Tab; label: string; count: number; icon: React.ReactNode }[] = [
     { key: 'devis', label: 'Devis', count: devisRefs.length, icon: <FileText className="w-3.5 h-3.5" /> },
     { key: 'factures', label: 'Factures', count: factureRefs.length, icon: <Receipt className="w-3.5 h-3.5" /> },
-    { key: 'avoirs', label: 'Avoirs', count: 0, icon: <CreditCard className="w-3.5 h-3.5" /> },
+    { key: 'avoirs', label: 'Avoirs', count: avoirRefs.length, icon: <CreditCard className="w-3.5 h-3.5" /> },
     { key: 'reglements', label: 'Règlements', count: reglementRefs.length, icon: <CheckCircle className="w-3.5 h-3.5" /> },
     { key: 'opportunities', label: 'Opportunités', count: client._count?.opportunities || 0, icon: <Target className="w-3.5 h-3.5" /> },
     { key: 'contacts', label: 'Contacts', count: client._count?.contacts || 0, icon: <Users className="w-3.5 h-3.5" /> },
@@ -538,7 +542,69 @@ export default function ClientDetailPage() {
             {activeTab === 'avoirs' && (
               <div className="mt-4">
                 <button onClick={() => setActiveTab(null)} className="text-[12px] text-[--k-primary] hover:underline mb-3 block">Fermer</button>
-                <p className="text-[13px] text-[--k-muted]">Aucun avoir pour ce client.</p>
+
+                {avoirRefs.length > 0 ? (
+                  <>
+                    {/* Avoirs summary */}
+                    <div className="flex items-center gap-4 flex-wrap text-[13px] mb-4">
+                      <span className="flex items-center gap-1.5">
+                        <CreditCard className="w-4 h-4 text-[--k-primary]" />
+                        Total : {avoirRefs.length} avoir(s) &rarr; <strong>{formatCurrency(sumAvoirTtc(avoirRefs))} TTC</strong>
+                      </span>
+                    </div>
+
+                    {/* Avoirs table */}
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-[13px]">
+                        <thead>
+                          <tr className="border-b border-[--k-border]">
+                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">N°</th>
+                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Lié à</th>
+                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Date</th>
+                            <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">HT</th>
+                            <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">TTC</th>
+                            <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Restant dû</th>
+                            <th className="px-3 py-2 text-center text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Règl.</th>
+                            <th className="px-3 py-2 text-center text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Statut</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {avoirRefs.map((a) => {
+                            const st = FACTURE_STATUS_LABELS[a.status] || { label: a.status, color: 'text-gray-600', bg: 'bg-gray-100' };
+                            return (
+                              <tr key={a.id} className="border-t border-[--k-border] hover:bg-[--k-surface-2] transition-colors">
+                                <td className="px-3 py-2 font-medium text-[--k-text]">
+                                  {a.objet ? (
+                                    <FloatingTooltip content={a.objet}>
+                                      <span className="cursor-help border-b border-dashed border-[--k-muted]">{a.indent || '--'}</span>
+                                    </FloatingTooltip>
+                                  ) : (
+                                    a.indent || '--'
+                                  )}
+                                </td>
+                                <td className="px-3 py-2 text-[--k-muted]">{a.factureIndent || '--'}</td>
+                                <td className="px-3 py-2 text-[--k-muted]">{a.dateCreation ? formatDate(a.dateCreation) : '--'}</td>
+                                <td className="px-3 py-2 text-right font-medium text-[--k-text]">{a.totalHt != null ? formatCurrency(a.totalHt) : '--'}</td>
+                                <td className="px-3 py-2 text-right font-medium text-[--k-text]">{a.totalTtc != null ? formatCurrency(a.totalTtc) : '--'}</td>
+                                <td className={`px-3 py-2 text-right font-medium ${Number(a.restantDu) > 0 ? 'text-red-600' : 'text-[--k-muted]'}`}>
+                                  {a.restantDu != null ? formatCurrency(a.restantDu) : '--'}
+                                </td>
+                                <td className="px-3 py-2 text-center text-[--k-muted]">{a.nbrReglement ?? '--'}</td>
+                                <td className="px-3 py-2 text-center">
+                                  <span className={`inline-flex px-2 py-0.5 text-[11px] font-semibold rounded-full ${st.bg} ${st.color}`}>
+                                    {st.label}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[13px] text-[--k-muted]">Aucun avoir pour ce client.</p>
+                )}
               </div>
             )}
 

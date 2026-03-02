@@ -52,6 +52,7 @@ export interface Client {
   opportunities?: any[];
   devisRefs?: DevisRef[];
   factureRefs?: FactureRef[];
+  avoirRefs?: AvoirRef[];
   reglementRefs?: ReglementRef[];
   _count?: {
     opportunities: number;
@@ -60,6 +61,7 @@ export interface Client {
     addresses?: number;
     devisRefs?: number;
     factureRefs?: number;
+    avoirRefs?: number;
     reglementRefs?: number;
   };
 }
@@ -165,6 +167,26 @@ export interface FactureRef {
   nbrReglement?: number;
   commercialNom?: string;
   idFactureCrm?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Avoirs
+export interface AvoirRef {
+  id: number;
+  clientId: number;
+  indent?: string;
+  objet?: string;
+  status: FactureStatus;
+  totalHt?: number;
+  totalTtc?: number;
+  totalTva?: number;
+  dateCreation?: string;
+  restantDu?: number;
+  nbrReglement?: number;
+  factureIndent?: string;
+  commercialNom?: string;
+  idAvoirCrm?: string;
   createdAt: string;
   updatedAt: string;
 }

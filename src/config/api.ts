@@ -25,6 +25,8 @@ export const API_ENDPOINTS = {
     DEVIS_ONE: (clientId: number, id: number) => `/api/clients/clients/${clientId}/devis/${id}`,
     FACTURES: (clientId: number) => `/api/clients/clients/${clientId}/factures`,
     FACTURES_ONE: (clientId: number, id: number) => `/api/clients/clients/${clientId}/factures/${id}`,
+    AVOIRS: (clientId: number) => `/api/clients/clients/${clientId}/avoirs`,
+    AVOIRS_ONE: (clientId: number, id: number) => `/api/clients/clients/${clientId}/avoirs/${id}`,
     REGLEMENTS: (clientId: number) => `/api/clients/clients/${clientId}/reglements`,
     REGLEMENTS_ONE: (clientId: number, id: number) => `/api/clients/clients/${clientId}/reglements/${id}`,
   },

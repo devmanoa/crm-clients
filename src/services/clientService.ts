@@ -1,6 +1,6 @@
 import api from './api';
 import { API_ENDPOINTS } from '../config/api';
-import type { Client, ClientFormData, ClientFilters, ClientContact, ClientComment, DevisRef, FactureRef, ReglementRef, GroupeClient, SourceLead, SecteurActivite, Country, ContactType } from '../types/client';
+import type { Client, ClientFormData, ClientFilters, ClientContact, ClientComment, DevisRef, FactureRef, AvoirRef, ReglementRef, GroupeClient, SourceLead, SecteurActivite, Country, ContactType } from '../types/client';
 import type { PaginatedResponse, ApiResponse } from '../types/common';
 
 export const clientService = {
@@ -149,6 +149,27 @@ export const clientService = {
 
   async deleteFacture(clientId: number, id: number): Promise<ApiResponse<{ message: string }>> {
     const { data } = await api.delete(API_ENDPOINTS.CLIENTS.FACTURES_ONE(clientId, id));
+    return data;
+  },
+
+  // Avoirs
+  async getAvoirs(clientId: number): Promise<ApiResponse<AvoirRef[]>> {
+    const { data } = await api.get(API_ENDPOINTS.CLIENTS.AVOIRS(clientId));
+    return data;
+  },
+
+  async createAvoir(clientId: number, avoir: Partial<AvoirRef>): Promise<ApiResponse<AvoirRef>> {
+    const { data } = await api.post(API_ENDPOINTS.CLIENTS.AVOIRS(clientId), avoir);
+    return data;
+  },
+
+  async updateAvoir(clientId: number, id: number, avoir: Partial<AvoirRef>): Promise<ApiResponse<AvoirRef>> {
+    const { data } = await api.put(API_ENDPOINTS.CLIENTS.AVOIRS_ONE(clientId, id), avoir);
+    return data;
+  },
+
+  async deleteAvoir(clientId: number, id: number): Promise<ApiResponse<{ message: string }>> {
+    const { data } = await api.delete(API_ENDPOINTS.CLIENTS.AVOIRS_ONE(clientId, id));
     return data;
   },
 

@@ -51,6 +51,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let tokenRefreshInterval: ReturnType<typeof setInterval>;
 
+    // Skip Keycloak if auth is disabled
+    if (import.meta.env.VITE_DISABLE_AUTH === 'true') {
+      setIsAuthenticated(true);
+      setUser({
+        id: 'dev-user',
+        email: 'dev@local',
+        username: 'dev',
+        firstName: 'Dev',
+        lastName: 'User',
+        fullName: 'Dev User',
+        roles: ['admin'],
+      });
+      setToken('dev-token');
+      setIsLoading(false);
+      return;
+    }
+
     const initKeycloak = async () => {
       try {
         const authenticated = await keycloak.init({

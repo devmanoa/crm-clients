@@ -14,7 +14,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import RichTextEditor, { type RichTextEditorRef } from '@/components/common/RichTextEditor';
 import FloatingTooltip from '@/components/common/FloatingTooltip';
 import CreateDevisModal from '@/components/devis/CreateDevisModal';
-import type { ClientComment, DevisRef, ReglementRef } from '@/types/client';
+import type { ClientComment, DevisRef, FactureRef, ReglementRef } from '@/types/client';
 
 type Tab = 'devis' | 'factures' | 'avoirs' | 'reglements' | 'opportunities' | 'contacts' | 'retard';
 
@@ -24,6 +24,15 @@ const DEVIS_STATUS_LABELS: Record<string, { label: string; color: string; bg: st
   accepte: { label: 'Accepté', color: 'text-emerald-700', bg: 'bg-emerald-50' },
   refuse: { label: 'Refusé', color: 'text-red-700', bg: 'bg-red-50' },
   annule: { label: 'Annulé', color: 'text-gray-500', bg: 'bg-gray-50' },
+};
+
+const FACTURE_STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
+  brouillon: { label: 'Brouillon', color: 'text-gray-600', bg: 'bg-gray-100' },
+  emise: { label: 'Émise', color: 'text-blue-700', bg: 'bg-blue-50' },
+  payee: { label: 'Payée', color: 'text-emerald-700', bg: 'bg-emerald-50' },
+  partiellement_payee: { label: 'Partiel', color: 'text-amber-700', bg: 'bg-amber-50' },
+  annulee: { label: 'Annulée', color: 'text-gray-500', bg: 'bg-gray-50' },
+  en_recouvrement: { label: 'Recouvrement', color: 'text-red-700', bg: 'bg-red-50' },
 };
 
 export default function ClientDetailPage() {
@@ -115,6 +124,14 @@ export default function ClientDetailPage() {
   const devisRefuse = devisRefs.filter(d => d.status === 'refuse' || d.status === 'annule');
   const sumHt = (list: DevisRef[]) => list.reduce((s, d) => s + (Number(d.totalHt) || 0), 0);
 
+  // Factures stats
+  const factureRefs = client.factureRefs || [];
+  const facturesPayees = factureRefs.filter(f => f.status === 'payee');
+  const facturesEnCours = factureRefs.filter(f => f.status === 'emise' || f.status === 'partiellement_payee');
+  const sumFactureHt = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(f.totalHt) || 0), 0);
+  const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(f.totalTtc) || 0), 0);
+  const sumFactureRestant = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(f.restantDu) || 0), 0);
+
   // Reglements stats
   const reglementRefs = client.reglementRefs || [];
   const regCredits = reglementRefs.filter(r => r.type === 'C');
@@ -124,7 +141,7 @@ export default function ClientDetailPage() {
   // Tab definitions
   const tabDefs: { key: Tab; label: string; count: number; icon: React.ReactNode }[] = [
     { key: 'devis', label: 'Devis', count: devisRefs.length, icon: <FileText className="w-3.5 h-3.5" /> },
-    { key: 'factures', label: 'Factures', count: 0, icon: <Receipt className="w-3.5 h-3.5" /> },
+    { key: 'factures', label: 'Factures', count: factureRefs.length, icon: <Receipt className="w-3.5 h-3.5" /> },
     { key: 'avoirs', label: 'Avoirs', count: 0, icon: <CreditCard className="w-3.5 h-3.5" /> },
     { key: 'reglements', label: 'Règlements', count: reglementRefs.length, icon: <CheckCircle className="w-3.5 h-3.5" /> },
     { key: 'opportunities', label: 'Opportunités', count: client._count?.opportunities || 0, icon: <Target className="w-3.5 h-3.5" /> },
@@ -434,7 +451,86 @@ export default function ClientDetailPage() {
             {activeTab === 'factures' && (
               <div className="mt-4">
                 <button onClick={() => setActiveTab(null)} className="text-[12px] text-[--k-primary] hover:underline mb-3 block">Fermer</button>
-                <p className="text-[13px] text-[--k-muted]">Aucune facture pour ce client.</p>
+
+                {factureRefs.length > 0 ? (
+                  <>
+                    {/* Factures summary */}
+                    <div className="flex items-center gap-4 flex-wrap text-[13px] mb-4">
+                      <span className="flex items-center gap-1.5">
+                        <Receipt className="w-4 h-4 text-[--k-primary]" />
+                        Total : {factureRefs.length} facture(s) &rarr; <strong>{formatCurrency(sumFactureTtc(factureRefs))} TTC</strong>
+                      </span>
+                      {facturesPayees.length > 0 && (
+                        <span className="flex items-center gap-1.5">
+                          <CheckCircle className="w-4 h-4 text-emerald-500" />
+                          Payée(s) : {facturesPayees.length}
+                        </span>
+                      )}
+                      {facturesEnCours.length > 0 && (
+                        <span className="flex items-center gap-1.5">
+                          <Clock className="w-4 h-4 text-amber-500" />
+                          En cours : {facturesEnCours.length}
+                        </span>
+                      )}
+                      {sumFactureRestant(factureRefs) > 0 && (
+                        <span className="flex items-center gap-1.5 text-red-600 font-medium">
+                          Restant dû : <strong>{formatCurrency(sumFactureRestant(factureRefs))}</strong>
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Factures table */}
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-[13px]">
+                        <thead>
+                          <tr className="border-b border-[--k-border]">
+                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">N°</th>
+                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Date</th>
+                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Événement</th>
+                            <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">HT</th>
+                            <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">TTC</th>
+                            <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Restant dû</th>
+                            <th className="px-3 py-2 text-center text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Règl.</th>
+                            <th className="px-3 py-2 text-center text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Statut</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {factureRefs.map((f) => {
+                            const st = FACTURE_STATUS_LABELS[f.status] || { label: f.status, color: 'text-gray-600', bg: 'bg-gray-100' };
+                            return (
+                              <tr key={f.id} className="border-t border-[--k-border] hover:bg-[--k-surface-2] transition-colors">
+                                <td className="px-3 py-2 font-medium text-[--k-text]">
+                                  {f.objet ? (
+                                    <FloatingTooltip content={f.objet}>
+                                      <span className="cursor-help border-b border-dashed border-[--k-muted]">{f.indent || '--'}</span>
+                                    </FloatingTooltip>
+                                  ) : (
+                                    f.indent || '--'
+                                  )}
+                                </td>
+                                <td className="px-3 py-2 text-[--k-muted]">{f.dateCreation ? formatDate(f.dateCreation) : '--'}</td>
+                                <td className="px-3 py-2 text-[--k-muted]">{f.dateEvenement ? formatDate(f.dateEvenement) : '--'}</td>
+                                <td className="px-3 py-2 text-right font-medium text-[--k-text]">{f.totalHt != null ? formatCurrency(f.totalHt) : '--'}</td>
+                                <td className="px-3 py-2 text-right font-medium text-[--k-text]">{f.totalTtc != null ? formatCurrency(f.totalTtc) : '--'}</td>
+                                <td className={`px-3 py-2 text-right font-medium ${Number(f.restantDu) > 0 ? 'text-red-600' : 'text-[--k-muted]'}`}>
+                                  {f.restantDu != null ? formatCurrency(f.restantDu) : '--'}
+                                </td>
+                                <td className="px-3 py-2 text-center text-[--k-muted]">{f.nbrReglement ?? '--'}</td>
+                                <td className="px-3 py-2 text-center">
+                                  <span className={`inline-flex px-2 py-0.5 text-[11px] font-semibold rounded-full ${st.bg} ${st.color}`}>
+                                    {st.label}
+                                  </span>
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[13px] text-[--k-muted]">Aucune facture pour ce client.</p>
+                )}
               </div>
             )}
 

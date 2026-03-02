@@ -51,6 +51,7 @@ export interface Client {
   comments?: ClientComment[];
   opportunities?: any[];
   devisRefs?: DevisRef[];
+  factureRefs?: FactureRef[];
   reglementRefs?: ReglementRef[];
   _count?: {
     opportunities: number;
@@ -58,6 +59,7 @@ export interface Client {
     contacts: number;
     addresses?: number;
     devisRefs?: number;
+    factureRefs?: number;
     reglementRefs?: number;
   };
 }
@@ -141,6 +143,28 @@ export interface DevisRef {
   commercialNom?: string;
   note?: string;
   idDevisCrm?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Factures
+export type FactureStatus = 'brouillon' | 'emise' | 'payee' | 'partiellement_payee' | 'annulee' | 'en_recouvrement';
+
+export interface FactureRef {
+  id: number;
+  clientId: number;
+  indent?: string;
+  objet?: string;
+  status: FactureStatus;
+  totalHt?: number;
+  totalTtc?: number;
+  totalTva?: number;
+  dateCreation?: string;
+  dateEvenement?: string;
+  restantDu?: number;
+  nbrReglement?: number;
+  commercialNom?: string;
+  idFactureCrm?: string;
   createdAt: string;
   updatedAt: string;
 }

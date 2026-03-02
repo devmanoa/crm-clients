@@ -51,12 +51,14 @@ export interface Client {
   comments?: ClientComment[];
   opportunities?: any[];
   devisRefs?: DevisRef[];
+  reglementRefs?: ReglementRef[];
   _count?: {
     opportunities: number;
     comments: number;
     contacts: number;
     addresses?: number;
     devisRefs?: number;
+    reglementRefs?: number;
   };
 }
 
@@ -139,6 +141,24 @@ export interface DevisRef {
   commercialNom?: string;
   note?: string;
   idDevisCrm?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Reglements
+export interface ReglementRef {
+  id: number;
+  clientId: number;
+  type: string; // "C" crédit, "D" débit
+  date?: string;
+  montant?: number;
+  montantRestant?: number;
+  moyenReglement?: string;
+  reference?: string;
+  note?: string;
+  etat?: string;
+  commercialNom?: string;
+  idReglementCrm?: string;
   createdAt: string;
   updatedAt: string;
 }

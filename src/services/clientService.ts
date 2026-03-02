@@ -1,6 +1,6 @@
 import api from './api';
 import { API_ENDPOINTS } from '../config/api';
-import type { Client, ClientFormData, ClientFilters, ClientContact, ClientComment, DevisRef, GroupeClient, SourceLead, SecteurActivite, Country, ContactType } from '../types/client';
+import type { Client, ClientFormData, ClientFilters, ClientContact, ClientComment, DevisRef, ReglementRef, GroupeClient, SourceLead, SecteurActivite, Country, ContactType } from '../types/client';
 import type { PaginatedResponse, ApiResponse } from '../types/common';
 
 export const clientService = {
@@ -128,6 +128,27 @@ export const clientService = {
 
   async deleteDevis(clientId: number, id: number): Promise<ApiResponse<{ message: string }>> {
     const { data } = await api.delete(API_ENDPOINTS.CLIENTS.DEVIS_ONE(clientId, id));
+    return data;
+  },
+
+  // Reglements
+  async getReglements(clientId: number): Promise<ApiResponse<ReglementRef[]>> {
+    const { data } = await api.get(API_ENDPOINTS.CLIENTS.REGLEMENTS(clientId));
+    return data;
+  },
+
+  async createReglement(clientId: number, reglement: Partial<ReglementRef>): Promise<ApiResponse<ReglementRef>> {
+    const { data } = await api.post(API_ENDPOINTS.CLIENTS.REGLEMENTS(clientId), reglement);
+    return data;
+  },
+
+  async updateReglement(clientId: number, id: number, reglement: Partial<ReglementRef>): Promise<ApiResponse<ReglementRef>> {
+    const { data } = await api.put(API_ENDPOINTS.CLIENTS.REGLEMENTS_ONE(clientId, id), reglement);
+    return data;
+  },
+
+  async deleteReglement(clientId: number, id: number): Promise<ApiResponse<{ message: string }>> {
+    const { data } = await api.delete(API_ENDPOINTS.CLIENTS.REGLEMENTS_ONE(clientId, id));
     return data;
   },
 

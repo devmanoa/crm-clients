@@ -14,7 +14,7 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import RichTextEditor, { type RichTextEditorRef } from '@/components/common/RichTextEditor';
 import FloatingTooltip from '@/components/common/FloatingTooltip';
 import CreateDevisModal from '@/components/devis/CreateDevisModal';
-import type { ClientComment, DevisRef } from '@/types/client';
+import type { ClientComment, DevisRef, ReglementRef } from '@/types/client';
 
 type Tab = 'devis' | 'factures' | 'avoirs' | 'reglements' | 'opportunities' | 'contacts' | 'retard';
 
@@ -115,12 +115,18 @@ export default function ClientDetailPage() {
   const devisRefuse = devisRefs.filter(d => d.status === 'refuse' || d.status === 'annule');
   const sumHt = (list: DevisRef[]) => list.reduce((s, d) => s + (Number(d.totalHt) || 0), 0);
 
+  // Reglements stats
+  const reglementRefs = client.reglementRefs || [];
+  const regCredits = reglementRefs.filter(r => r.type === 'C');
+  const regDebits = reglementRefs.filter(r => r.type === 'D');
+  const sumMontant = (list: ReglementRef[]) => list.reduce((s, r) => s + (Number(r.montant) || 0), 0);
+
   // Tab definitions
   const tabDefs: { key: Tab; label: string; count: number; icon: React.ReactNode }[] = [
     { key: 'devis', label: 'Devis', count: devisRefs.length, icon: <FileText className="w-3.5 h-3.5" /> },
     { key: 'factures', label: 'Factures', count: 0, icon: <Receipt className="w-3.5 h-3.5" /> },
     { key: 'avoirs', label: 'Avoirs', count: 0, icon: <CreditCard className="w-3.5 h-3.5" /> },
-    { key: 'reglements', label: 'Règlements', count: 0, icon: <CheckCircle className="w-3.5 h-3.5" /> },
+    { key: 'reglements', label: 'Règlements', count: reglementRefs.length, icon: <CheckCircle className="w-3.5 h-3.5" /> },
     { key: 'opportunities', label: 'Opportunités', count: client._count?.opportunities || 0, icon: <Target className="w-3.5 h-3.5" /> },
     { key: 'contacts', label: 'Contacts', count: client._count?.contacts || 0, icon: <Users className="w-3.5 h-3.5" /> },
     { key: 'retard', label: 'Factures retard', count: 0, icon: <AlertTriangle className="w-3.5 h-3.5" /> },
@@ -444,7 +450,77 @@ export default function ClientDetailPage() {
             {activeTab === 'reglements' && (
               <div className="mt-4">
                 <button onClick={() => setActiveTab(null)} className="text-[12px] text-[--k-primary] hover:underline mb-3 block">Fermer</button>
-                <p className="text-[13px] text-[--k-muted]">Aucun règlement pour ce client.</p>
+
+                {reglementRefs.length > 0 ? (
+                  <>
+                    {/* Règlements summary */}
+                    <div className="flex items-center gap-4 flex-wrap text-[13px] mb-4">
+                      {regCredits.length > 0 && (
+                        <span className="flex items-center gap-1.5">
+                          <CheckCircle className="w-4 h-4 text-emerald-500" />
+                          Crédit(s) : {regCredits.length} &rarr; <strong>{formatCurrency(sumMontant(regCredits))}</strong>
+                        </span>
+                      )}
+                      {regDebits.length > 0 && (
+                        <span className="flex items-center gap-1.5">
+                          <XCircle className="w-4 h-4 text-red-500" />
+                          Débit(s) : {regDebits.length} &rarr; <strong>{formatCurrency(sumMontant(regDebits))}</strong>
+                        </span>
+                      )}
+                      <span className="flex items-center gap-1.5 font-medium">
+                        Solde : <strong>{formatCurrency(sumMontant(regCredits) - sumMontant(regDebits))}</strong>
+                      </span>
+                    </div>
+
+                    {/* Règlements table */}
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full text-[13px]">
+                        <thead>
+                          <tr className="border-b border-[--k-border]">
+                            <th className="px-3 py-2 text-center text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Type</th>
+                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Date</th>
+                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Moyen</th>
+                            <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Référence</th>
+                            <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Montant</th>
+                            <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Restant</th>
+                            <th className="px-3 py-2 text-center text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">État</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {reglementRefs.map((r) => (
+                            <tr key={r.id} className="border-t border-[--k-border] hover:bg-[--k-surface-2] transition-colors">
+                              <td className="px-3 py-2 text-center">
+                                <span className={`inline-flex px-2 py-0.5 text-[11px] font-semibold rounded-full ${
+                                  r.type === 'C' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
+                                }`}>
+                                  {r.type === 'C' ? 'Crédit' : 'Débit'}
+                                </span>
+                              </td>
+                              <td className="px-3 py-2 text-[--k-muted]">{r.date ? formatDate(r.date) : '--'}</td>
+                              <td className="px-3 py-2 text-[--k-text]">{r.moyenReglement || '--'}</td>
+                              <td className="px-3 py-2 text-[--k-text]">{r.reference || '--'}</td>
+                              <td className={`px-3 py-2 text-right font-medium ${r.type === 'C' ? 'text-emerald-600' : 'text-red-600'}`}>
+                                {r.montant != null ? formatCurrency(r.montant) : '--'}
+                              </td>
+                              <td className="px-3 py-2 text-right text-[--k-muted]">
+                                {r.montantRestant != null ? formatCurrency(r.montantRestant) : '--'}
+                              </td>
+                              <td className="px-3 py-2 text-center">
+                                {r.etat ? (
+                                  <span className="inline-flex px-2 py-0.5 text-[11px] font-medium bg-gray-100 text-gray-600 rounded-full">
+                                    {r.etat}
+                                  </span>
+                                ) : '--'}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[13px] text-[--k-muted]">Aucun règlement pour ce client.</p>
+                )}
               </div>
             )}
 

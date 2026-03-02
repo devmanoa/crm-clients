@@ -23,6 +23,8 @@ export const API_ENDPOINTS = {
     COMMENT: (clientId: number, id: number) => `/api/clients/clients/${clientId}/comments/${id}`,
     DEVIS: (clientId: number) => `/api/clients/clients/${clientId}/devis`,
     DEVIS_ONE: (clientId: number, id: number) => `/api/clients/clients/${clientId}/devis/${id}`,
+    REGLEMENTS: (clientId: number) => `/api/clients/clients/${clientId}/reglements`,
+    REGLEMENTS_ONE: (clientId: number, id: number) => `/api/clients/clients/${clientId}/reglements/${id}`,
   },
   REFERENCE_DATA: {
     SECTORS: '/api/clients/reference-data/sectors',

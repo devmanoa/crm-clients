@@ -128,8 +128,7 @@ export default function ClientDetailPage() {
   const factureRefs = client.factureRefs || [];
   const facturesPayees = factureRefs.filter(f => f.status === 'payee');
   const facturesEnCours = factureRefs.filter(f => f.status === 'emise' || f.status === 'partiellement_payee');
-  const sumFactureHt = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(f.totalHt) || 0), 0);
-  const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(f.totalTtc) || 0), 0);
+const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(f.totalTtc) || 0), 0);
   const sumFactureRestant = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(f.restantDu) || 0), 0);
 
   // Avoirs stats

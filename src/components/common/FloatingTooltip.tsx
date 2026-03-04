@@ -8,7 +8,12 @@ interface FloatingTooltipProps {
   maxWidth?: number;
 }
 
+function stripHtml(html: string): string {
+  return html.replace(/<[^>]*>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
+}
+
 export default function FloatingTooltip({ content, children, maxWidth = 360 }: FloatingTooltipProps) {
+  const cleanContent = stripHtml(content);
   const [open, setOpen] = useState(false);
   const [coords, setCoords] = useState({ x: 0, y: 0 });
   const refEl = useRef<HTMLSpanElement>(null);
@@ -42,7 +47,7 @@ export default function FloatingTooltip({ content, children, maxWidth = 360 }: F
           style={{ position: 'fixed', left: coords.x, top: coords.y, maxWidth, zIndex: 9999 }}
           className="rounded-lg bg-slate-900 px-3 py-2 text-[12px] font-normal leading-relaxed text-white shadow-lg pointer-events-none"
         >
-          {content}
+          {cleanContent}
         </div>,
         document.body,
       )}

@@ -65,6 +65,7 @@ export default function ClientEditPage() {
 
       <ClientForm
         defaultValues={{
+          idClientCrm: currentClient.idClientCrm,
           client_type: currentClient.client_type,
           nom: currentClient.nom,
           prenom: currentClient.prenom,

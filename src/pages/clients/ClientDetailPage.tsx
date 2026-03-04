@@ -47,6 +47,7 @@ export default function ClientDetailPage() {
   const [activityFilter, setActivityFilter] = useState<'all' | 'comments' | 'actions'>('all');
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [showCreateDevis, setShowCreateDevis] = useState(false);
+  const [pdfModal, setPdfModal] = useState<string | null>(null);
 
   const crmBaseUrl = import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr';
 
@@ -387,7 +388,7 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                                   {objetText ? (
                                     <FloatingTooltip content={objetText}>
                                       <button
-                                        onClick={() => d.idDevisCrm && openCrmPopup(`${crmBaseUrl}/fr/devis/pdfversion/${d.idDevisCrm}`, `pdfDevis_${d.idDevisCrm}`)}
+                                        onClick={() => d.idDevisCrm && setPdfModal(`${crmBaseUrl}/fr/devis/pdfversion/${d.idDevisCrm}`)}
                                         className="hover:underline cursor-pointer"
                                       >
                                         {d.indent || `#${d.id}`}
@@ -395,7 +396,7 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                                     </FloatingTooltip>
                                   ) : (
                                     <button
-                                      onClick={() => d.idDevisCrm && openCrmPopup(`${crmBaseUrl}/fr/devis/pdfversion/${d.idDevisCrm}`, `pdfDevis_${d.idDevisCrm}`)}
+                                      onClick={() => d.idDevisCrm && setPdfModal(`${crmBaseUrl}/fr/devis/pdfversion/${d.idDevisCrm}`)}
                                       className="hover:underline cursor-pointer"
                                     >
                                       {d.indent || `#${d.id}`}
@@ -427,7 +428,7 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                                           Éditer
                                         </a>
                                         <button
-                                          onClick={() => openCrmPopup(`${crmBaseUrl}/fr/devis/pdfversion/${d.idDevisCrm}`, `pdfDevis_${d.idDevisCrm}`)}
+                                          onClick={() => setPdfModal(`${crmBaseUrl}/fr/devis/pdfversion/${d.idDevisCrm}`)}
                                           className="flex w-full items-center gap-2 px-3 py-2 text-[13px] text-[--k-text] hover:bg-[--k-surface-2] transition"
                                         >
                                           <FileText className="w-3.5 h-3.5" />
@@ -502,13 +503,23 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                             const st = FACTURE_STATUS_LABELS[f.status] || { label: f.status, color: 'text-gray-600', bg: 'bg-gray-100' };
                             return (
                               <tr key={f.id} className="border-t border-[--k-border] hover:bg-[--k-surface-2] transition-colors">
-                                <td className="px-3 py-2 font-medium text-[--k-text]">
+                                <td className="px-3 py-2 font-medium text-[--k-primary]">
                                   {f.objet ? (
                                     <FloatingTooltip content={f.objet}>
-                                      <span className="cursor-help border-b border-dashed border-[--k-muted]">{f.indent || '--'}</span>
+                                      <button
+                                        onClick={() => f.idFactureCrm && setPdfModal(`${crmBaseUrl}/fr/devis-factures/pdfversion/${f.idFactureCrm}`)}
+                                        className={f.idFactureCrm ? 'hover:underline cursor-pointer' : 'cursor-default'}
+                                      >
+                                        {f.indent || '--'}
+                                      </button>
                                     </FloatingTooltip>
                                   ) : (
-                                    f.indent || '--'
+                                    <button
+                                      onClick={() => f.idFactureCrm && setPdfModal(`${crmBaseUrl}/fr/devis-factures/pdfversion/${f.idFactureCrm}`)}
+                                      className={f.idFactureCrm ? 'hover:underline cursor-pointer' : 'cursor-default'}
+                                    >
+                                      {f.indent || '--'}
+                                    </button>
                                   )}
                                 </td>
                                 <td className="px-3 py-2 text-[--k-muted]">{f.dateCreation ? formatDate(f.dateCreation) : '--'}</td>
@@ -572,13 +583,23 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                             const st = FACTURE_STATUS_LABELS[a.status] || { label: a.status, color: 'text-gray-600', bg: 'bg-gray-100' };
                             return (
                               <tr key={a.id} className="border-t border-[--k-border] hover:bg-[--k-surface-2] transition-colors">
-                                <td className="px-3 py-2 font-medium text-[--k-text]">
+                                <td className="px-3 py-2 font-medium text-[--k-primary]">
                                   {a.objet ? (
                                     <FloatingTooltip content={a.objet}>
-                                      <span className="cursor-help border-b border-dashed border-[--k-muted]">{a.indent || '--'}</span>
+                                      <button
+                                        onClick={() => a.idAvoirCrm && setPdfModal(`${crmBaseUrl}/fr/avoirs/pdfversion/${a.idAvoirCrm}`)}
+                                        className={a.idAvoirCrm ? 'hover:underline cursor-pointer' : 'cursor-default'}
+                                      >
+                                        {a.indent || '--'}
+                                      </button>
                                     </FloatingTooltip>
                                   ) : (
-                                    a.indent || '--'
+                                    <button
+                                      onClick={() => a.idAvoirCrm && setPdfModal(`${crmBaseUrl}/fr/avoirs/pdfversion/${a.idAvoirCrm}`)}
+                                      className={a.idAvoirCrm ? 'hover:underline cursor-pointer' : 'cursor-default'}
+                                    >
+                                      {a.indent || '--'}
+                                    </button>
                                   )}
                                 </td>
                                 <td className="px-3 py-2 text-[--k-muted]">{a.factureIndent || '--'}</td>
@@ -1076,6 +1097,35 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
           )}
         </div>
       </div>
+
+      {/* ---- PDF Modal ---- */}
+      {pdfModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60" onClick={() => setPdfModal(null)} />
+          <div className="relative z-10 w-[90vw] h-[90vh] bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[--k-border] bg-[--k-surface]">
+              <span className="text-[13px] font-medium text-[--k-text]">Document</span>
+              <div className="flex items-center gap-2">
+                <a
+                  href={pdfModal}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[12px] text-[--k-primary] hover:underline"
+                >
+                  Ouvrir dans un nouvel onglet
+                </a>
+                <button
+                  onClick={() => setPdfModal(null)}
+                  className="ml-2 p-1.5 hover:bg-[--k-surface-2] rounded-lg transition text-[--k-muted]"
+                >
+                  <XCircle className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+            <iframe src={pdfModal} className="flex-1 w-full" title="Document PDF" />
+          </div>
+        </div>
+      )}
 
       <CreateDevisModal
         isOpen={showCreateDevis}

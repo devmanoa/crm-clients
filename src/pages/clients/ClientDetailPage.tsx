@@ -1100,11 +1100,10 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
               <div className="flex items-center gap-2">
                 <a
                   href={pdfModal}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  download
                   className="text-[12px] text-[--k-primary] hover:underline"
                 >
-                  Ouvrir dans un nouvel onglet
+                  Télécharger le document
                 </a>
                 <button
                   onClick={() => setPdfModal(null)}

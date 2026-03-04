@@ -48,7 +48,7 @@ export default function ClientFilters() {
           <Filter className="w-4 h-4" />
           Filtres
         </button>
-        {(filters.key || filters.clientType || filters.groupeClientId) && (
+        {(filters.key || filters.clientType || filters.groupeClientId || filters.hasDevis !== undefined || filters.hasFacture !== undefined || filters.hasReglement !== undefined) && (
           <button
             onClick={() => {
               setSearchKey('');
@@ -136,6 +136,42 @@ export default function ClientFilters() {
               {secteurs.map((s) => (
                 <option key={s.id} value={s.id}>{s.nom}</option>
               ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-[--k-muted] mb-1">A des devis</label>
+            <select
+              value={filters.hasDevis === undefined ? '' : filters.hasDevis ? 'oui' : 'non'}
+              onChange={(e) => setFilters({ hasDevis: e.target.value === '' ? undefined : e.target.value === 'oui' })}
+              className="input-field"
+            >
+              <option value="">Tous</option>
+              <option value="oui">Oui</option>
+              <option value="non">Non</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-[--k-muted] mb-1">A des factures</label>
+            <select
+              value={filters.hasFacture === undefined ? '' : filters.hasFacture ? 'oui' : 'non'}
+              onChange={(e) => setFilters({ hasFacture: e.target.value === '' ? undefined : e.target.value === 'oui' })}
+              className="input-field"
+            >
+              <option value="">Tous</option>
+              <option value="oui">Oui</option>
+              <option value="non">Non</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-[11px] font-medium text-[--k-muted] mb-1">A des règlements</label>
+            <select
+              value={filters.hasReglement === undefined ? '' : filters.hasReglement ? 'oui' : 'non'}
+              onChange={(e) => setFilters({ hasReglement: e.target.value === '' ? undefined : e.target.value === 'oui' })}
+              className="input-field"
+            >
+              <option value="">Tous</option>
+              <option value="oui">Oui</option>
+              <option value="non">Non</option>
             </select>
           </div>
           <div>

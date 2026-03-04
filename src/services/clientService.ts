@@ -19,6 +19,9 @@ export const clientService = {
     if (filters.sectorIds?.length) params.sectorIds = filters.sectorIds.join(',');
     if (filters.isQualifie !== undefined) params.isQualifie = filters.isQualifie;
     if (filters.hasAddress !== undefined) params.hasAddress = filters.hasAddress;
+    if (filters.hasDevis !== undefined) params.hasDevis = filters.hasDevis;
+    if (filters.hasFacture !== undefined) params.hasFacture = filters.hasFacture;
+    if (filters.hasReglement !== undefined) params.hasReglement = filters.hasReglement;
     if (filters.dateFrom) params.dateFrom = filters.dateFrom;
     if (filters.dateTo) params.dateTo = filters.dateTo;
     if (filters.sortBy) params.sortBy = filters.sortBy;

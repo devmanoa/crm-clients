@@ -250,6 +250,9 @@ export interface ClientFilters {
   sectorIds?: number[];
   isQualifie?: boolean;
   hasAddress?: boolean;
+  hasDevis?: boolean;
+  hasFacture?: boolean;
+  hasReglement?: boolean;
   dateFrom?: string;
   dateTo?: string;
   page: number;

@@ -657,7 +657,6 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                             <th className="px-3 py-2 text-left text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Référence</th>
                             <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Montant</th>
                             <th className="px-3 py-2 text-right text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">Restant</th>
-                            <th className="px-3 py-2 text-center text-[11px] font-semibold text-[--k-muted] uppercase tracking-wider">État</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -678,13 +677,6 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                               </td>
                               <td className="px-3 py-2 text-right text-[--k-muted]">
                                 {r.montantRestant != null ? formatCurrency(r.montantRestant) : '--'}
-                              </td>
-                              <td className="px-3 py-2 text-center">
-                                {r.etat ? (
-                                  <span className="inline-flex px-2 py-0.5 text-[11px] font-medium bg-gray-100 text-gray-600 rounded-full">
-                                    {r.etat}
-                                  </span>
-                                ) : '--'}
                               </td>
                             </tr>
                           ))}

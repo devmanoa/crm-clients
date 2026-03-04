@@ -1099,8 +1099,9 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
               <span className="text-[13px] font-medium text-[--k-text]">Document</span>
               <div className="flex items-center gap-2">
                 <a
-                  href={pdfModal}
-                  download
+                  href={`${pdfModal}?download=true`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-[12px] text-[--k-primary] hover:underline"
                 >
                   Télécharger le document

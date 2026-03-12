@@ -96,9 +96,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }, 60000);
         }
       } catch (error) {
+        const msg = error instanceof Error ? error.message : JSON.stringify(error);
         console.error('Keycloak initialization failed:', error);
         setIsAuthenticated(false);
-        setAuthError('Erreur de connexion au serveur d\'authentification.');
+        setAuthError(`Erreur de connexion au serveur d'authentification. (${msg})`);
       } finally {
         setIsLoading(false);
       }

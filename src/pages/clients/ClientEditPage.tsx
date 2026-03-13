@@ -92,7 +92,7 @@ export default function ClientEditPage() {
           source_lead_id: currentClient.source_lead_id,
           type_commercial: currentClient.type_commercial,
           contact_raison: currentClient.contact_raison,
-          sectorIds: currentClient.sectors?.map((s) => s.secteur_activite_id),
+          sectorIds: currentClient.sectors?.map((s) => s.secteur_activite_id).filter((id): id is number => id != null),
         }}
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}

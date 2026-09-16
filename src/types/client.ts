@@ -136,8 +136,8 @@ export interface CommentAttachment {
 
 export interface ClientSectorRelation {
   id: number;
-  client_id: number;
-  secteur_activite_id: number;
+  clientId: number;
+  sectorId: number;
   sector: SecteurActivite;
 }
 
@@ -313,4 +313,19 @@ export interface ClientFormData {
   type_commercial?: TypeCommercial;
   contact_raison?: string;
   sectorIds?: number[];
+  /**
+   * Liste complète des adresses du client. Envoyée telle quelle : le serveur
+   * remplace l'existant et recopie la principale dans les champs adresse/cp/
+   * ville ci-dessus. Champ absent = adresses inchangées.
+   */
+  addresses?: ClientAddressFormData[];
+}
+
+export interface ClientAddressFormData {
+  label?: string;
+  adresse?: string;
+  adresse2?: string;
+  cp?: string;
+  ville?: string;
+  isPrimary?: boolean;
 }

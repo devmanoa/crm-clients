@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
-import { Save, Building2, User } from 'lucide-react';
+import { Save, Building2, User, Plus, Trash2 } from 'lucide-react';
 import { useClientStore } from '@/stores/clientStore';
-import type { ClientFormData } from '@/types/client';
+import { ADDRESS_LABEL_SUGGESTIONS, type ClientAddressFormData, type ClientFormData } from '@/types/client';
+
+const ADDRESS_LABEL_LIST_ID = 'client-form-address-labels';
 
 interface ClientFormProps {
   defaultValues?: Partial<ClientFormData>;
@@ -28,6 +30,30 @@ export default function ClientForm({ defaultValues, onSubmit, isSubmitting }: Cl
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(form);
+  };
+
+  const addresses = form.addresses ?? [];
+
+  const setAddresses = (next: ClientAddressFormData[]) => updateField('addresses', next);
+
+  const addAddress = () => {
+    // La première adresse est principale d'office, comme côté serveur.
+    setAddresses([...addresses, { label: '', isPrimary: addresses.length === 0 }]);
+  };
+
+  const updateAddress = (index: number, field: keyof ClientAddressFormData, value: string) => {
+    setAddresses(addresses.map((a, i) => (i === index ? { ...a, [field]: value } : a)));
+  };
+
+  const setPrimaryAddress = (index: number) => {
+    setAddresses(addresses.map((a, i) => ({ ...a, isPrimary: i === index })));
+  };
+
+  const removeAddress = (index: number) => {
+    const next = addresses.filter((_, i) => i !== index);
+    // Retirer la principale laisserait la liste sans défaut : on promeut la première.
+    if (next.length > 0 && !next.some((a) => a.isPrimary)) next[0] = { ...next[0], isPrimary: true };
+    setAddresses(next);
   };
 
   const toggleSector = (sectorId: number) => {
@@ -212,46 +238,136 @@ export default function ClientForm({ defaultValues, onSubmit, isSubmitting }: Cl
         </div>
       </div>
 
-      {/* Address */}
+      {/* Addresses */}
       <div className="bg-[--k-surface] rounded-2xl shadow-sm shadow-black/[0.03] border border-[--k-border] p-6">
-        <h3 className="text-lg font-semibold text-[--k-text] mb-4">Adresse</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-lg font-semibold text-[--k-text]">Adresses</h3>
+            <p className="text-[12px] text-[--k-muted] mt-0.5">
+              Nommez chaque adresse (Principale, Bureau, Livraison…). L'adresse principale
+              est celle reprise sur la fiche client.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={addAddress}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-medium text-[--k-primary] bg-[--k-primary-2] rounded-lg hover:brightness-95 transition shrink-0"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            Ajouter une adresse
+          </button>
+        </div>
+
+        <datalist id={ADDRESS_LABEL_LIST_ID}>
+          {ADDRESS_LABEL_SUGGESTIONS.map((s) => (
+            <option key={s} value={s} />
+          ))}
+        </datalist>
+
+        {addresses.length === 0 ? (
+          <p className="text-[13px] text-[--k-muted]">
+            Aucune adresse. Utilisez « Ajouter une adresse » pour en saisir une.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {addresses.map((addr, index) => (
+              <div
+                key={index}
+                className={`rounded-xl border p-3 space-y-2 ${
+                  addr.isPrimary
+                    ? 'border-[--k-primary-border] bg-[--k-primary-2]/30'
+                    : 'border-[--k-border] bg-[--k-surface-2]/40'
+                }`}
+              >
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-medium text-[--k-muted] mb-1">Nom de l'adresse</label>
+                    <input
+                      type="text"
+                      list={ADDRESS_LABEL_LIST_ID}
+                      value={addr.label || ''}
+                      maxLength={100}
+                      placeholder="Principale, Bureau…"
+                      onChange={(e) => updateAddress(index, 'label', e.target.value)}
+                      className="input-field"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-[11px] font-medium text-[--k-muted] mb-1">Adresse</label>
+                    <input
+                      type="text"
+                      value={addr.adresse || ''}
+                      maxLength={255}
+                      onChange={(e) => updateAddress(index, 'adresse', e.target.value)}
+                      className="input-field"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-medium text-[--k-muted] mb-1">Complement d'adresse</label>
+                  <input
+                    type="text"
+                    value={addr.adresse2 || ''}
+                    maxLength={255}
+                    onChange={(e) => updateAddress(index, 'adresse2', e.target.value)}
+                    className="input-field"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-medium text-[--k-muted] mb-1">Code postal</label>
+                    <input
+                      type="text"
+                      value={addr.cp || ''}
+                      maxLength={20}
+                      onChange={(e) => updateAddress(index, 'cp', e.target.value)}
+                      className="input-field"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-[11px] font-medium text-[--k-muted] mb-1">Ville</label>
+                    <input
+                      type="text"
+                      value={addr.ville || ''}
+                      maxLength={120}
+                      onChange={(e) => updateAddress(index, 'ville', e.target.value.toUpperCase())}
+                      className="input-field"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-1">
+                  <label className="flex items-center gap-2 text-[12px] text-[--k-text] cursor-pointer">
+                    <input
+                      type="radio"
+                      name="primary-address"
+                      checked={!!addr.isPrimary}
+                      onChange={() => setPrimaryAddress(index)}
+                      className="border-[--k-border]"
+                    />
+                    Adresse principale
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => removeAddress(index)}
+                    className="flex items-center gap-1 px-2.5 py-1 text-[12px] text-[--k-muted] rounded-lg hover:bg-red-50 hover:text-[--k-danger] transition"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    Retirer
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Localisation */}
+      <div className="bg-[--k-surface] rounded-2xl shadow-sm shadow-black/[0.03] border border-[--k-border] p-6">
+        <h3 className="text-lg font-semibold text-[--k-text] mb-4">Localisation</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="md:col-span-2">
-            <label className="block text-[11px] font-medium text-[--k-muted] mb-1">Adresse</label>
-            <input
-              type="text"
-              value={form.adresse || ''}
-              onChange={(e) => updateField('adresse', e.target.value)}
-              className="input-field"
-            />
-          </div>
-          <div className="md:col-span-2">
-            <label className="block text-[11px] font-medium text-[--k-muted] mb-1">Complement d'adresse</label>
-            <input
-              type="text"
-              value={form.adresse_2 || ''}
-              onChange={(e) => updateField('adresse_2', e.target.value)}
-              className="input-field"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] font-medium text-[--k-muted] mb-1">Code postal</label>
-            <input
-              type="text"
-              value={form.cp || ''}
-              onChange={(e) => updateField('cp', e.target.value)}
-              className="input-field"
-            />
-          </div>
-          <div>
-            <label className="block text-[11px] font-medium text-[--k-muted] mb-1">Ville</label>
-            <input
-              type="text"
-              value={form.ville || ''}
-              onChange={(e) => updateField('ville', e.target.value.toUpperCase())}
-              className="input-field"
-            />
-          </div>
           <div>
             <label className="block text-[11px] font-medium text-[--k-muted] mb-1">Departement</label>
             <input

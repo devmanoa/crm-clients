@@ -92,7 +92,30 @@ export default function ClientEditPage() {
           source_lead_id: currentClient.source_lead_id,
           type_commercial: currentClient.type_commercial,
           contact_raison: currentClient.contact_raison,
-          sectorIds: currentClient.sectors?.map((s) => s.secteur_activite_id).filter((id): id is number => id != null),
+          sectorIds: currentClient.sectors?.map((s) => s.sectorId).filter((id): id is number => id != null),
+          addresses: currentClient.addresses?.length
+            ? currentClient.addresses.map((a) => ({
+                label: a.label ?? '',
+                adresse: a.adresse ?? '',
+                adresse2: a.adresse2 ?? '',
+                cp: a.cp ?? '',
+                ville: a.ville ?? '',
+                isPrimary: a.isPrimary,
+              }))
+            : // Client antérieur aux adresses multiples : on reprend l'adresse
+              // portée par la fiche pour ne pas la perdre à l'enregistrement.
+              [currentClient.adresse, currentClient.cp, currentClient.ville].some(Boolean)
+              ? [
+                  {
+                    label: 'Principale',
+                    adresse: currentClient.adresse ?? '',
+                    adresse2: currentClient.adresse_2 ?? '',
+                    cp: currentClient.cp ?? '',
+                    ville: currentClient.ville ?? '',
+                    isPrimary: true,
+                  },
+                ]
+              : [],
         }}
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}

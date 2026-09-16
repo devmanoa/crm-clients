@@ -324,6 +324,55 @@ export interface ClientFormData {
   addresses?: ClientAddressFormData[];
 }
 
+// Doublons / fusion
+
+/** Un des deux clients d'une paire de doublons. */
+export interface DuplicateSide {
+  id: number;
+  nom: string;
+  prenom?: string | null;
+  enseigne?: string | null;
+  email?: string | null;
+  telephone?: string | null;
+  ville?: string | null;
+  clientType: ClientType;
+  createdAt: string;
+}
+
+export interface DuplicatePair {
+  /** Ce qui a fait matcher la paire : même email ou même nom. */
+  reason: 'email' | 'nom';
+  left: DuplicateSide;
+  right: DuplicateSide;
+}
+
+/** Décompte de ce qu'une fusion déplacerait, par type de donnée. */
+export interface MergeMoves {
+  contacts: number;
+  addresses: number;
+  comments: number;
+  sectors: number;
+  devis: number;
+  factures: number;
+  avoirs: number;
+  reglements: number;
+  opportunities: number;
+}
+
+export interface MergePreview {
+  primary: { id: number; nom: string; label: string };
+  duplicate: { id: number; nom: string; label: string };
+  moves: MergeMoves;
+  total: number;
+}
+
+export interface MergeResult {
+  primary: { id: number; label: string };
+  duplicate: { id: number; label: string };
+  moved: MergeMoves;
+  total: number;
+}
+
 export interface ClientAddressFormData {
   label?: string;
   adresse?: string;

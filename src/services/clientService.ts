@@ -1,6 +1,6 @@
 import api from './api';
 import { API_ENDPOINTS } from '../config/api';
-import type { Client, ClientFormData, ClientFilters, ClientContact, ClientAddress, ClientComment, DevisRef, FactureRef, AvoirRef, ReglementRef, GroupeClient, SourceLead, SecteurActivite, Country, ContactType } from '../types/client';
+import type { Client, ClientFormData, ClientFilters, ClientContact, ClientAddress, ClientComment, DevisRef, FactureRef, AvoirRef, ReglementRef, GroupeClient, SourceLead, SecteurActivite, Country, ContactType, DuplicatePair, MergePreview, MergeResult } from '../types/client';
 import type { PaginatedResponse, ApiResponse } from '../types/common';
 
 export const clientService = {
@@ -85,6 +85,22 @@ export const clientService = {
 
   async deleteContact(clientId: number, id: number): Promise<ApiResponse<{ message: string }>> {
     const { data } = await api.delete(API_ENDPOINTS.CLIENTS.CONTACT(clientId, id));
+    return data;
+  },
+
+  // Duplicates / merge
+  async getDuplicates(page = 1, limit = 20): Promise<PaginatedResponse<DuplicatePair>> {
+    const { data } = await api.get(API_ENDPOINTS.CLIENTS.DUPLICATES, { params: { page, limit } });
+    return data;
+  },
+
+  async getMergePreview(primaryId: number, duplicateId: number): Promise<ApiResponse<MergePreview>> {
+    const { data } = await api.get(API_ENDPOINTS.CLIENTS.MERGE_PREVIEW(primaryId, duplicateId));
+    return data;
+  },
+
+  async merge(primaryId: number, duplicateId: number): Promise<ApiResponse<MergeResult>> {
+    const { data } = await api.post(API_ENDPOINTS.CLIENTS.MERGE(primaryId), { duplicateId });
     return data;
   },
 

@@ -16,6 +16,9 @@ export const API_ENDPOINTS = {
     DELETE: (id: number) => `/api/clients/clients/${id}`,
     SEARCH: '/api/clients/clients/search',
     DUPLICATES: '/api/clients/clients/duplicates',
+    MERGE_PREVIEW: (id: number, duplicateId: number) =>
+      `/api/clients/clients/${id}/merge-preview/${duplicateId}`,
+    MERGE: (id: number) => `/api/clients/clients/${id}/merge`,
     BULK_ACTION: '/api/clients/clients/bulk-action',
     CONTACTS: (clientId: number) => `/api/clients/clients/${clientId}/contacts`,
     CONTACT: (clientId: number, id: number) => `/api/clients/clients/${clientId}/contacts/${id}`,

@@ -66,38 +66,53 @@ export interface Client {
   };
 }
 
+// Prisma sérialise en camelCase : les noms ci-dessous sont ceux réellement
+// renvoyés par l'API, pas ceux des colonnes SQL.
 export interface ClientContact {
   id: number;
   idClientCrm?: string;
-  client_id: number;
+  clientId: number;
   civilite?: string;
   nom: string;
   prenom?: string;
   position?: string;
   email?: string;
   tel?: string;
-  telephone_2?: string;
-  contact_type_id?: number;
-  is_primary: boolean;
-  created_at: string;
-  updated_at: string;
-  contact_type?: ContactType;
+  telephone2?: string;
+  contactTypeId?: number;
+  isPrimary: boolean;
+  createdAt: string;
+  updatedAt: string;
+  contactType?: ContactType;
 }
 
 export interface ClientAddress {
   id: number;
-  client_id: number;
-  label?: string;
-  adresse?: string;
-  adresse_2?: string;
-  cp?: string;
-  ville?: string;
-  pays_id?: number;
-  latitude?: string;
-  longitude?: string;
-  is_primary: boolean;
+  clientId: number;
+  /** Nom de l'adresse : « Principale », « Bureau », « Livraison »… texte libre. */
+  label?: string | null;
+  adresse?: string | null;
+  adresse2?: string | null;
+  cp?: string | null;
+  ville?: string | null;
+  paysId?: number | null;
+  latitude?: string | null;
+  longitude?: string | null;
+  isPrimary: boolean;
+  createdAt?: string;
+  updatedAt?: string;
   pays?: Country;
 }
+
+/** Valeurs proposées dans le formulaire d'adresse, sans être imposées. */
+export const ADDRESS_LABEL_SUGGESTIONS = [
+  'Principale',
+  'Bureau',
+  'Siège social',
+  'Facturation',
+  'Livraison',
+  'Entrepôt',
+] as const;
 
 export interface ClientComment {
   id: number;

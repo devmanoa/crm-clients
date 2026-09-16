@@ -1,6 +1,6 @@
 import api from './api';
 import { API_ENDPOINTS } from '../config/api';
-import type { Client, ClientFormData, ClientFilters, ClientContact, ClientComment, DevisRef, FactureRef, AvoirRef, ReglementRef, GroupeClient, SourceLead, SecteurActivite, Country, ContactType } from '../types/client';
+import type { Client, ClientFormData, ClientFilters, ClientContact, ClientAddress, ClientComment, DevisRef, FactureRef, AvoirRef, ReglementRef, GroupeClient, SourceLead, SecteurActivite, Country, ContactType } from '../types/client';
 import type { PaginatedResponse, ApiResponse } from '../types/common';
 
 export const clientService = {
@@ -85,6 +85,27 @@ export const clientService = {
 
   async deleteContact(clientId: number, id: number): Promise<ApiResponse<{ message: string }>> {
     const { data } = await api.delete(API_ENDPOINTS.CLIENTS.CONTACT(clientId, id));
+    return data;
+  },
+
+  // Addresses
+  async getAddresses(clientId: number): Promise<ApiResponse<ClientAddress[]>> {
+    const { data } = await api.get(API_ENDPOINTS.CLIENTS.ADDRESSES(clientId));
+    return data;
+  },
+
+  async createAddress(clientId: number, address: Partial<ClientAddress>): Promise<ApiResponse<ClientAddress>> {
+    const { data } = await api.post(API_ENDPOINTS.CLIENTS.ADDRESSES(clientId), address);
+    return data;
+  },
+
+  async updateAddress(clientId: number, id: number, address: Partial<ClientAddress>): Promise<ApiResponse<ClientAddress>> {
+    const { data } = await api.put(API_ENDPOINTS.CLIENTS.ADDRESS(clientId, id), address);
+    return data;
+  },
+
+  async deleteAddress(clientId: number, id: number): Promise<ApiResponse<{ message: string }>> {
+    const { data } = await api.delete(API_ENDPOINTS.CLIENTS.ADDRESS(clientId, id));
     return data;
   },
 

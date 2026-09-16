@@ -14,9 +14,10 @@ import LoadingSpinner from '@/components/common/LoadingSpinner';
 import RichTextEditor, { type RichTextEditorRef } from '@/components/common/RichTextEditor';
 import FloatingTooltip from '@/components/common/FloatingTooltip';
 import CreateDevisModal from '@/components/devis/CreateDevisModal';
+import ClientAddresses from '@/components/clients/ClientAddresses';
 import type { ClientComment, DevisRef, FactureRef, AvoirRef, ReglementRef } from '@/types/client';
 
-type Tab = 'devis' | 'factures' | 'avoirs' | 'reglements' | 'opportunities' | 'contacts' | 'retard';
+type Tab = 'devis' | 'factures' | 'avoirs' | 'reglements' | 'opportunities' | 'contacts' | 'addresses' | 'retard';
 
 // Build the public URL for a comment attachment. The API now stores only the
 // stored filename and serves it under /uploads. Legacy rows may still hold a
@@ -57,6 +58,8 @@ export default function ClientDetailPage() {
   const [activityFilter, setActivityFilter] = useState<'all' | 'comments' | 'actions'>('all');
   const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const [showCreateDevis, setShowCreateDevis] = useState(false);
+  // Le compteur de l'onglet suit les ajouts/suppressions faits dans le panneau.
+  const [addressCount, setAddressCount] = useState<number | null>(null);
   const [pdfModal, setPdfModal] = useState<string | null>(null);
 
   const crmBaseUrl = import.meta.env.VITE_CRM_URL || 'https://crm.konitys.fr';
@@ -152,6 +155,7 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
     { key: 'reglements', label: 'Règlements', count: reglementRefs.length, icon: <CheckCircle className="w-3.5 h-3.5" /> },
     { key: 'opportunities', label: 'Opportunités', count: client._count?.opportunities || 0, icon: <Target className="w-3.5 h-3.5" /> },
     { key: 'contacts', label: 'Contacts', count: client._count?.contacts || 0, icon: <Users className="w-3.5 h-3.5" /> },
+    { key: 'addresses', label: 'Adresses', count: addressCount ?? client.addresses?.length ?? 0, icon: <MapPin className="w-3.5 h-3.5" /> },
     { key: 'retard', label: 'Factures retard', count: 0, icon: <AlertTriangle className="w-3.5 h-3.5" /> },
   ];
 
@@ -772,7 +776,7 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                       // Group contacts by contact_type
                       const grouped = new Map<string, typeof client.contacts>();
                       for (const contact of client.contacts!) {
-                        const typeName = contact.contact_type?.nom || 'Autre';
+                        const typeName = contact.contactType?.nom || 'Autre';
                         if (!grouped.has(typeName)) grouped.set(typeName, []);
                         grouped.get(typeName)!.push(contact);
                       }
@@ -808,13 +812,13 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                                       ) : '--'}
                                     </td>
                                     <td className="px-3 py-2 text-[--k-muted]">
-                                      {contact.tel || contact.telephone_2 || '--'}
-                                      {contact.tel && contact.telephone_2 && (
-                                        <span className="text-[--k-muted] ml-1">/ {contact.telephone_2}</span>
+                                      {contact.tel || contact.telephone2 || '--'}
+                                      {contact.tel && contact.telephone2 && (
+                                        <span className="text-[--k-muted] ml-1">/ {contact.telephone2}</span>
                                       )}
                                     </td>
                                     <td className="px-3 py-2">
-                                      {contact.is_primary && (
+                                      {contact.isPrimary && (
                                         <span className="inline-flex px-2 py-0.5 text-[11px] font-medium bg-emerald-50 text-emerald-700 rounded-full">Principal</span>
                                       )}
                                     </td>
@@ -830,6 +834,18 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                 ) : (
                   <p className="text-[13px] text-[--k-muted]">Aucun contact pour ce client.</p>
                 )}
+              </div>
+            )}
+
+            {/* ---- Addresses Tab ---- */}
+            {activeTab === 'addresses' && (
+              <div className="mt-4">
+                <button onClick={() => setActiveTab(null)} className="text-[12px] text-[--k-primary] hover:underline mb-3 block">Fermer</button>
+                <ClientAddresses
+                  clientId={client.id}
+                  initialAddresses={client.addresses}
+                  onCountChange={setAddressCount}
+                />
               </div>
             )}
 

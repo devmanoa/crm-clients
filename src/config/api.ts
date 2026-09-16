@@ -19,6 +19,8 @@ export const API_ENDPOINTS = {
     BULK_ACTION: '/api/clients/clients/bulk-action',
     CONTACTS: (clientId: number) => `/api/clients/clients/${clientId}/contacts`,
     CONTACT: (clientId: number, id: number) => `/api/clients/clients/${clientId}/contacts/${id}`,
+    ADDRESSES: (clientId: number) => `/api/clients/clients/${clientId}/addresses`,
+    ADDRESS: (clientId: number, id: number) => `/api/clients/clients/${clientId}/addresses/${id}`,
     COMMENTS: (clientId: number) => `/api/clients/clients/${clientId}/comments`,
     COMMENT: (clientId: number, id: number) => `/api/clients/clients/${clientId}/comments/${id}`,
     DEVIS: (clientId: number) => `/api/clients/clients/${clientId}/devis`,

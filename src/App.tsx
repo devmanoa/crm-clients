@@ -6,6 +6,7 @@ import ClientListPage from './pages/clients/ClientListPage';
 import ClientCreatePage from './pages/clients/ClientCreatePage';
 import ClientEditPage from './pages/clients/ClientEditPage';
 import ClientDetailPage from './pages/clients/ClientDetailPage';
+import SectorsPage from './pages/settings/SectorsPage';
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
             <Route path="opportunities" element={<div className="p-6"><h1 className="text-2xl font-bold">Opportunités - A venir</h1></div>} />
             <Route path="opportunities/pipeline" element={<div className="p-6"><h1 className="text-2xl font-bold">Pipeline - A venir</h1></div>} />
             <Route path="opportunities/dashboard" element={<div className="p-6"><h1 className="text-2xl font-bold">Dashboard opportunités - A venir</h1></div>} />
+
+            <Route path="settings/sectors" element={<SectorsPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

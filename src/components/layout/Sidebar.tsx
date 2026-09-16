@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '../../lib/utils';
 import {
-  BarChart3, GitBranch, List, UserPlus, Copy,
+  BarChart3, GitBranch, List, UserPlus, Copy, Tags,
   ChevronsLeft, ChevronsRight, HelpCircle,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -33,6 +33,12 @@ const SECTIONS: SidebarSection[] = [
       { label: 'Liste', icon: List, to: '/opportunities' },
       { label: 'Pipeline', icon: GitBranch, to: '/opportunities/pipeline' },
       { label: 'Tableau de bord', icon: BarChart3, to: '/opportunities/dashboard' },
+    ],
+  },
+  {
+    label: 'Paramètres',
+    items: [
+      { label: "Secteurs d'activité", icon: Tags, to: '/settings/sectors' },
     ],
   },
 ];

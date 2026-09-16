@@ -230,6 +230,8 @@ export interface SourceLead {
 export interface SecteurActivite {
   id: number;
   nom: string;
+  /** Nombre de clients rattachés. Renvoyé par /api/clients/sectors uniquement. */
+  clientCount?: number;
   /**
    * Hiérarchie non exploitée : le référentiel est plat aujourd'hui (aucun
    * secteur ne porte de parent) et l'API ne renvoie plus `children`.

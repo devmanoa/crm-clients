@@ -30,6 +30,13 @@ export const API_ENDPOINTS = {
     REGLEMENTS: (clientId: number) => `/api/clients/clients/${clientId}/reglements`,
     REGLEMENTS_ONE: (clientId: number, id: number) => `/api/clients/clients/${clientId}/reglements/${id}`,
   },
+  SECTORS: {
+    LIST: '/api/clients/sectors',
+    GET: (id: number) => `/api/clients/sectors/${id}`,
+    CREATE: '/api/clients/sectors',
+    UPDATE: (id: number) => `/api/clients/sectors/${id}`,
+    DELETE: (id: number) => `/api/clients/sectors/${id}`,
+  },
   REFERENCE_DATA: {
     SECTORS: '/api/clients/reference-data/sectors',
     GROUPS: '/api/clients/reference-data/groups',

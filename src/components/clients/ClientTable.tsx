@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Eye, Pencil, Trash2, ArrowUpDown } from 'lucide-react';
 import { useClientStore } from '@/stores/clientStore';
-import { formatDate } from '@/lib/utils';
+import { formatDateShort } from '@/lib/utils';
 import type { Client } from '@/types/client';
 
 export default function ClientTable() {
@@ -59,7 +59,7 @@ export default function ClientTable() {
               <SortHeader column="nom" label="Client" />
               <th className="px-4 py-2 text-left text-xs font-medium text-[--k-muted] uppercase tracking-wider bg-white">Type</th>
               <SortHeader column="email" label="Email" />
-              <SortHeader column="ville" label="Ville" />
+              <SortHeader column="contact_raison" label="Contact pour" />
               <th className="px-4 py-2 text-left text-xs font-medium text-[--k-muted] uppercase tracking-wider bg-white">Groupe</th>
               <SortHeader column="created_at" label="Création" />
               <th className="px-4 py-2 text-right text-xs font-medium text-[--k-muted] uppercase tracking-wider bg-white">Actions</th>
@@ -99,12 +99,14 @@ export default function ClientTable() {
                 </td>
                 <td className="px-4 py-1.5 text-[--k-muted]">{client.email || '-'}</td>
                 <td className="px-4 py-1.5 text-[--k-muted]">
-                  {client.ville ? `${client.ville}${client.departement ? ` (${client.departement})` : ''}` : '-'}
+                  <span className="block max-w-[220px] truncate" title={client.contact_raison || undefined}>
+                    {client.contact_raison || '-'}
+                  </span>
                 </td>
                 <td className="px-4 py-1.5 text-[--k-muted]">
                   {client.groupe_client?.nom || '-'}
                 </td>
-                <td className="px-4 py-1.5 text-[--k-muted]">{formatDate(client.created_at)}</td>
+                <td className="px-4 py-1.5 text-[--k-muted] whitespace-nowrap">{formatDateShort(client.created_at)}</td>
                 <td className="px-4 py-1.5 text-right" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center justify-end gap-0.5">
                     <button

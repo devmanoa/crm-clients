@@ -1,47 +1,13 @@
 import { NavLink, useLocation } from 'react-router-dom';
 import { cn } from '../../lib/utils';
-import {
-  BarChart3, GitBranch, List, UserPlus, Copy, Tags,
-  ChevronsLeft, ChevronsRight, HelpCircle,
-} from 'lucide-react';
+import { ChevronsLeft, ChevronsRight, HelpCircle } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { NAV_SECTIONS, type NavItem, type NavSection } from '../../config/navigation';
 
-interface SidebarItem {
-  label: string;
-  icon: LucideIcon;
-  to: string;
-}
+type SidebarItem = NavItem;
+type SidebarSection = NavSection;
 
-interface SidebarSection {
-  label: string;
-  items: SidebarItem[];
-}
-
-const SECTIONS: SidebarSection[] = [
-  {
-    label: 'Clients',
-    items: [
-      { label: 'Liste clients', icon: List, to: '/clients' },
-      { label: 'Nouveau client', icon: UserPlus, to: '/clients/add' },
-      { label: 'Tableau de bord', icon: BarChart3, to: '/clients/dashboard' },
-      { label: 'Doublons', icon: Copy, to: '/clients/duplicates' },
-    ],
-  },
-  {
-    label: 'Opportunités',
-    items: [
-      { label: 'Liste', icon: List, to: '/opportunities' },
-      { label: 'Pipeline', icon: GitBranch, to: '/opportunities/pipeline' },
-      { label: 'Tableau de bord', icon: BarChart3, to: '/opportunities/dashboard' },
-    ],
-  },
-  {
-    label: 'Paramètres',
-    items: [
-      { label: "Secteurs d'activité", icon: Tags, to: '/settings/sectors' },
-    ],
-  },
-];
+const SECTIONS: SidebarSection[] = NAV_SECTIONS;
 
 interface SidebarProps {
   collapsed: boolean;
@@ -68,13 +34,13 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   function SidebarNavItem({ item }: { item: SidebarItem }) {
     const Icon = item.icon;
     const isActive =
-      item.to === '/clients'
+      item.path === '/clients'
         ? location.pathname === '/clients'
-        : location.pathname.startsWith(item.to);
+        : location.pathname.startsWith(item.path);
 
     const link = (
       <NavLink
-        to={item.to}
+        to={item.path}
         className={cn(
           'relative flex items-center gap-2.5 rounded-lg px-2.5 py-[7px] text-[13px] font-medium transition-all duration-150',
           collapsed ? 'justify-center px-0' : 'justify-start',
@@ -152,7 +118,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
               )}
               <nav className="space-y-0.5 px-2">
                 {section.items.map((item) => (
-                  <SidebarNavItem key={item.to} item={item} />
+                  <SidebarNavItem key={item.path} item={item} />
                 ))}
               </nav>
             </div>

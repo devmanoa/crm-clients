@@ -1,7 +1,7 @@
 import React, { Suspense, useState, useEffect, Component } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { List, UserPlus, BarChart3, GitBranch, Copy } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { NAV_SECTIONS } from '../../config/navigation';
 import { loadRemoteComponent } from '../../remoteLoader';
 import Topbar from './Topbar';
 import Sidebar from './Sidebar';
@@ -36,26 +36,9 @@ class RemoteErrorBoundary extends Component<EBProps, EBState> {
   }
 }
 
-// ── Sidebar config ──────────────────────────────────────────────
-const SIDEBAR_SECTIONS = [
-  {
-    label: 'Clients',
-    items: [
-      { icon: List, label: 'Liste clients', path: '/clients' },
-      { icon: UserPlus, label: 'Nouveau client', path: '/clients/add' },
-      { icon: BarChart3, label: 'Tableau de bord', path: '/clients/dashboard' },
-      { icon: Copy, label: 'Doublons', path: '/clients/duplicates' },
-    ],
-  },
-  {
-    label: 'Opportunités',
-    items: [
-      { icon: List, label: 'Liste', path: '/opportunities' },
-      { icon: GitBranch, label: 'Pipeline', path: '/opportunities/pipeline' },
-      { icon: BarChart3, label: 'Tableau de bord', path: '/opportunities/dashboard' },
-    ],
-  },
-];
+// La config du menu vit dans config/navigation.ts : la Sidebar locale de repli
+// la consomme aussi, et les deux listes avaient divergé.
+const SIDEBAR_SECTIONS = NAV_SECTIONS;
 
 // ── Layout ──────────────────────────────────────────────────────
 export default function AppLayout() {

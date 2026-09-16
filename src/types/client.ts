@@ -230,6 +230,11 @@ export interface SourceLead {
 export interface SecteurActivite {
   id: number;
   nom: string;
+  /**
+   * Hiérarchie non exploitée : le référentiel est plat aujourd'hui (aucun
+   * secteur ne porte de parent) et l'API ne renvoie plus `children`.
+   * Conservé pour le jour où les secteurs seront regroupés.
+   */
   parent_id?: number;
   children?: SecteurActivite[];
 }

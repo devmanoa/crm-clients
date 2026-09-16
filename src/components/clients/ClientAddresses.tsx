@@ -4,6 +4,7 @@ import { clientService } from '@/services/clientService';
 import { useAuth } from '@/contexts/AuthContext';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
+import AddressAutocomplete from '@/components/common/AddressAutocomplete';
 import { ADDRESS_LABEL_SUGGESTIONS, type ClientAddress } from '@/types/client';
 
 /** Rôles autorisés à écrire, alignés sur WRITE_ROLES côté API. */
@@ -182,11 +183,19 @@ export default function ClientAddresses({ clientId, initialAddresses, onCountCha
           </div>
           <div className="sm:col-span-2">
             <label className="block text-[11px] text-[--k-muted] mb-1">Adresse</label>
-            <input
-              className={field}
+            <AddressAutocomplete
               value={draft.adresse}
-              maxLength={255}
-              onChange={(e) => setDraft({ ...draft, adresse: e.target.value })}
+              onChange={(v) => setDraft((d) => ({ ...d, adresse: v }))}
+              onPlaceSelected={(parsed) =>
+                setDraft((d) => ({
+                  ...d,
+                  adresse: parsed.adresse,
+                  cp: parsed.cp || d.cp,
+                  ville: parsed.ville || d.ville,
+                }))
+              }
+              placeholder="Commencez à taper l'adresse…"
+              className={field}
             />
           </div>
         </div>

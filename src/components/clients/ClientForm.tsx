@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Save, Building2, User, Plus, Trash2 } from 'lucide-react';
 import { useClientStore } from '@/stores/clientStore';
+import AddressAutocomplete from '@/components/common/AddressAutocomplete';
+import type { ParsedAddress } from '@/lib/googleMaps';
 import { ADDRESS_LABEL_SUGGESTIONS, type ClientAddressFormData, type ClientFormData } from '@/types/client';
 
 const ADDRESS_LABEL_LIST_ID = 'client-form-address-labels';
@@ -47,6 +49,29 @@ export default function ClientForm({ defaultValues, onSubmit, isSubmitting }: Cl
 
   const setPrimaryAddress = (index: number) => {
     setAddresses(addresses.map((a, i) => ({ ...a, isPrimary: i === index })));
+  };
+
+  /**
+   * Applique une adresse choisie dans Google Places : les champs postaux vont
+   * sur la ligne concernée, le département et le pays sur le client (ils lui
+   * appartiennent), et seulement si l'adresse est la principale.
+   */
+  const applyPlaceToAddress = (index: number, parsed: ParsedAddress) => {
+    setForm((prev) => {
+      const list = (prev.addresses ?? []).map((a, i) =>
+        i === index
+          ? { ...a, adresse: parsed.adresse, cp: parsed.cp || a.cp, ville: parsed.ville || a.ville }
+          : a,
+      );
+
+      const isPrimary = list[index]?.isPrimary;
+      return {
+        ...prev,
+        addresses: list,
+        ...(isPrimary && parsed.departement ? { departement: parsed.departement } : {}),
+        ...(isPrimary && parsed.country ? { country: parsed.country } : {}),
+      };
+    });
   };
 
   const removeAddress = (index: number) => {
@@ -294,12 +319,11 @@ export default function ClientForm({ defaultValues, onSubmit, isSubmitting }: Cl
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-[11px] font-medium text-[--k-muted] mb-1">Adresse</label>
-                    <input
-                      type="text"
+                    <AddressAutocomplete
                       value={addr.adresse || ''}
-                      maxLength={255}
-                      onChange={(e) => updateAddress(index, 'adresse', e.target.value)}
-                      className="input-field"
+                      onChange={(v) => updateAddress(index, 'adresse', v)}
+                      onPlaceSelected={(parsed) => applyPlaceToAddress(index, parsed)}
+                      placeholder="Commencez à taper l'adresse…"
                     />
                   </div>
                 </div>

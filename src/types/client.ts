@@ -1,50 +1,53 @@
 export type ClientType = 'corporation' | 'person';
 export type TypeCommercial = 'client' | 'prospect';
 
+// Prisma sérialise ses champs en camelCase : les noms ci-dessous sont ceux
+// réellement renvoyés par l'API, pas ceux des colonnes SQL. Les formulaires,
+// eux, envoient du snake_case (voir ClientFormData et mapClientBody côté API).
 export interface Client {
   id: number;
   idClientCrm?: string;
-  client_type: ClientType;
+  clientType: ClientType;
   nom: string;
   prenom?: string;
   enseigne?: string;
   siren?: string;
   siret?: string;
-  tva_intracom?: string;
-  code_naf?: string;
+  tvaIntracom?: string;
+  codeNaf?: string;
   effectif?: number;
-  chiffre_affaire?: number;
+  chiffreAffaire?: number;
   email?: string;
   telephone?: string;
   mobile?: string;
   adresse?: string;
-  adresse_2?: string;
+  adresse2?: string;
   cp?: string;
   ville?: string;
-  pays_id?: number;
+  paysId?: number;
   departement?: string;
   country?: string;
-  addr_lat?: string;
-  addr_lng?: string;
-  site_web?: string;
+  addrLat?: string;
+  addrLng?: string;
+  siteWeb?: string;
   note?: string;
-  code_quadra?: string;
-  groupe_client_id?: number;
-  source_lead_id?: number;
-  type_commercial?: TypeCommercial;
-  contact_raison?: string;
-  connaissance_selfizee?: string;
-  is_qualifie: boolean;
-  is_deleted: boolean;
-  created_by?: number;
-  updated_by?: number;
-  created_at: string;
-  updated_at: string;
+  codeQuadra?: string;
+  groupeClientId?: number;
+  sourceLeadId?: number;
+  typeCommercial?: TypeCommercial;
+  contactRaison?: string;
+  connaissanceSelfizee?: string;
+  isQualifie: boolean;
+  isDeleted: boolean;
+  createdBy?: number;
+  updatedBy?: number;
+  createdAt: string;
+  updatedAt: string;
 
   // Relations
   pays?: Country;
-  groupe_client?: GroupeClient;
-  source_lead?: SourceLead;
+  groupeClient?: GroupeClient;
+  sourceLead?: SourceLead;
   contacts?: ClientContact[];
   addresses?: ClientAddress[];
   sectors?: ClientSectorRelation[];
@@ -116,22 +119,22 @@ export const ADDRESS_LABEL_SUGGESTIONS = [
 
 export interface ClientComment {
   id: number;
-  client_id: number;
-  user_id?: number;
-  user_name?: string;
+  clientId: number;
+  userId?: number;
+  userName?: string;
   contenu: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
   attachments?: CommentAttachment[];
 }
 
 export interface CommentAttachment {
   id: number;
-  comment_id: number;
-  file_name: string;
-  file_path: string;
-  file_size?: number;
-  mime_type?: string;
+  commentId: number;
+  fileName: string;
+  filePath: string;
+  fileSize?: number;
+  mimeType?: string;
 }
 
 export interface ClientSectorRelation {

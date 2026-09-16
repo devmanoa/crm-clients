@@ -24,7 +24,7 @@ export default function ClientTable() {
   };
 
   const getClientName = (client: Client) => {
-    if (client.client_type === 'corporation') {
+    if (client.clientType === 'corporation') {
       return client.enseigne ? `${client.nom} (${client.enseigne})` : client.nom;
     }
     return `${client.prenom || ''} ${client.nom}`.trim();
@@ -90,23 +90,23 @@ export default function ClientTable() {
                 </td>
                 <td className="px-4 py-1.5">
                   <span className={`inline-flex px-2 py-0.5 text-[11px] font-medium rounded-full ${
-                    client.client_type === 'corporation'
+                    client.clientType === 'corporation'
                       ? 'bg-blue-50 text-blue-700'
                       : 'bg-emerald-50 text-emerald-700'
                   }`}>
-                    {client.client_type === 'corporation' ? 'Pro' : 'Part'}
+                    {client.clientType === 'corporation' ? 'Pro' : 'Part'}
                   </span>
                 </td>
                 <td className="px-4 py-1.5 text-[--k-muted]">{client.email || '-'}</td>
                 <td className="px-4 py-1.5 text-[--k-muted]">
-                  <span className="block max-w-[220px] truncate" title={client.contact_raison || undefined}>
-                    {client.contact_raison || '-'}
+                  <span className="block max-w-[220px] truncate" title={client.contactRaison || undefined}>
+                    {client.contactRaison || '-'}
                   </span>
                 </td>
                 <td className="px-4 py-1.5 text-[--k-muted]">
-                  {client.groupe_client?.nom || '-'}
+                  {client.groupeClient?.nom || '-'}
                 </td>
-                <td className="px-4 py-1.5 text-[--k-muted] whitespace-nowrap">{formatDateShort(client.created_at)}</td>
+                <td className="px-4 py-1.5 text-[--k-muted] whitespace-nowrap">{formatDateShort(client.createdAt)}</td>
                 <td className="px-4 py-1.5 text-right" onClick={(e) => e.stopPropagation()}>
                   <div className="flex items-center justify-end gap-0.5">
                     <button

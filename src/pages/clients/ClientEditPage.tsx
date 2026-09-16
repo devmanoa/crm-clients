@@ -50,7 +50,7 @@ export default function ClientEditPage() {
         <div>
           <h1 className="text-2xl font-bold text-[var(--k-text)]">Modifier client</h1>
           <p className="text-sm text-[var(--k-muted)] mt-1">
-            {currentClient.client_type === 'corporation'
+            {currentClient.clientType === 'corporation'
               ? currentClient.enseigne || currentClient.nom
               : `${currentClient.prenom || ''} ${currentClient.nom}`.trim()}
           </p>
@@ -66,32 +66,32 @@ export default function ClientEditPage() {
       <ClientForm
         defaultValues={{
           idClientCrm: currentClient.idClientCrm,
-          client_type: currentClient.client_type,
+          client_type: currentClient.clientType,
           nom: currentClient.nom,
           prenom: currentClient.prenom,
           enseigne: currentClient.enseigne,
           siren: currentClient.siren,
           siret: currentClient.siret,
-          tva_intracom: currentClient.tva_intracom,
-          code_naf: currentClient.code_naf,
+          tva_intracom: currentClient.tvaIntracom,
+          code_naf: currentClient.codeNaf,
           effectif: currentClient.effectif,
-          chiffre_affaire: currentClient.chiffre_affaire,
+          chiffre_affaire: currentClient.chiffreAffaire,
           email: currentClient.email,
           telephone: currentClient.telephone,
           mobile: currentClient.mobile,
           adresse: currentClient.adresse,
-          adresse_2: currentClient.adresse_2,
+          adresse_2: currentClient.adresse2,
           cp: currentClient.cp,
           ville: currentClient.ville,
-          pays_id: currentClient.pays_id,
+          pays_id: currentClient.paysId,
           departement: currentClient.departement,
           country: currentClient.country,
-          site_web: currentClient.site_web,
+          site_web: currentClient.siteWeb,
           note: currentClient.note,
-          groupe_client_id: currentClient.groupe_client_id,
-          source_lead_id: currentClient.source_lead_id,
-          type_commercial: currentClient.type_commercial,
-          contact_raison: currentClient.contact_raison,
+          groupe_client_id: currentClient.groupeClientId,
+          source_lead_id: currentClient.sourceLeadId,
+          type_commercial: currentClient.typeCommercial,
+          contact_raison: currentClient.contactRaison,
           sectorIds: currentClient.sectors?.map((s) => s.sectorId).filter((id): id is number => id != null),
           addresses: currentClient.addresses?.length
             ? currentClient.addresses.map((a) => ({
@@ -109,7 +109,7 @@ export default function ClientEditPage() {
                   {
                     label: 'Principale',
                     adresse: currentClient.adresse ?? '',
-                    adresse2: currentClient.adresse_2 ?? '',
+                    adresse2: currentClient.adresse2 ?? '',
                     cp: currentClient.cp ?? '',
                     ville: currentClient.ville ?? '',
                     isPrimary: true,

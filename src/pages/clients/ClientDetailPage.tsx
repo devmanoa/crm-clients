@@ -108,7 +108,7 @@ useEffect(() => {
   if (!currentClient) return <div className="text-center py-12 text-[--k-muted]">Client non trouvé</div>;
 
   const client = currentClient;
-  const clientName = client.client_type === 'corporation'
+  const clientName = client.clientType === 'corporation'
     ? (client.enseigne ? `${client.nom} - ${client.enseigne}` : client.nom)
     : `${client.nom} ${client.prenom || ''}`.trim();
 
@@ -220,16 +220,16 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
 
               <div className="flex items-center gap-2 flex-wrap">
                 <span className={`inline-flex px-2.5 py-0.5 text-[11px] font-semibold rounded-full ${
-                  client.type_commercial === 'prospect' ? 'bg-gray-100 text-gray-600' : 'bg-emerald-50 text-emerald-700'
+                  client.typeCommercial === 'prospect' ? 'bg-gray-100 text-gray-600' : 'bg-emerald-50 text-emerald-700'
                 }`}>
-                  {client.type_commercial === 'prospect' ? 'Prospect' : 'Client'}
+                  {client.typeCommercial === 'prospect' ? 'Prospect' : 'Client'}
                 </span>
                 <span className={`inline-flex px-2.5 py-0.5 text-[11px] font-semibold rounded-full ${
-                  client.client_type === 'corporation' ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-500'
+                  client.clientType === 'corporation' ? 'bg-blue-50 text-blue-700' : 'bg-gray-100 text-gray-500'
                 }`}>
-                  {client.client_type === 'corporation' ? 'Pro' : 'Part'}
+                  {client.clientType === 'corporation' ? 'Pro' : 'Part'}
                 </span>
-                {client.is_qualifie && (
+                {client.isQualifie && (
                   <span className="inline-flex px-2.5 py-0.5 text-[11px] font-semibold rounded-full bg-purple-50 text-purple-700">
                     Qualifié
                   </span>
@@ -268,20 +268,20 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                 </p>
               )}
 
-              {client.site_web && (
+              {client.siteWeb && (
                 <p className="text-[13px] flex items-center gap-1.5">
                   <Globe className="w-3.5 h-3.5 text-[--k-muted]" />
-                  <a href={client.site_web} target="_blank" rel="noreferrer" className="text-[--k-primary] hover:underline">{client.site_web}</a>
+                  <a href={client.siteWeb} target="_blank" rel="noreferrer" className="text-[--k-primary] hover:underline">{client.siteWeb}</a>
                 </p>
               )}
 
               {/* Code client / SIREN / SIRET */}
               <div className="text-[13px] text-[--k-muted] space-y-0.5 pt-1">
-                {client.code_quadra && <p>Code client : {client.code_quadra}</p>}
+                {client.codeQuadra && <p>Code client : {client.codeQuadra}</p>}
                 {client.idClientCrm && <p>ID CRM : {client.idClientCrm}</p>}
                 {client.siren && <p>Siren : {client.siren}</p>}
                 {client.siret && <p>Siret : {client.siret}</p>}
-                {client.tva_intracom && <p>TVA Intracom : {client.tva_intracom}</p>}
+                {client.tvaIntracom && <p>TVA Intracom : {client.tvaIntracom}</p>}
               </div>
 
               {/* More actions */}
@@ -740,7 +740,7 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                             {opp.montant && (
                               <span className="text-[13px] font-medium text-[--k-text]">{formatCurrency(opp.montant)}</span>
                             )}
-                            <span className="text-[12px] text-[--k-muted] italic">{formatDate(opp.created_at || opp.createdAt)}</span>
+                            <span className="text-[12px] text-[--k-muted] italic">{formatDate(opp.createdAt || opp.createdAt)}</span>
                             {expandedItems[`opp-${opp.id}`]
                               ? <ChevronUp className="w-4 h-4 text-[--k-muted]" />
                               : <ChevronDown className="w-4 h-4 text-[--k-muted]" />
@@ -752,7 +752,7 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                             <p><strong>Pipeline :</strong> {opp.pipeline?.nom || '--'}</p>
                             <p><strong>Étape :</strong> {opp.stage?.nom || '--'}</p>
                             <p><strong>Potentiel :</strong> {opp.montant ? formatCurrency(opp.montant) : '--'}</p>
-                            <p><strong>Date :</strong> {formatDate(opp.created_at || opp.createdAt)}</p>
+                            <p><strong>Date :</strong> {formatDate(opp.createdAt || opp.createdAt)}</p>
                             {opp.is_hot && <p className="text-[--k-danger] font-medium flex items-center gap-1"><Target className="w-3.5 h-3.5" /> Opportunité chaude</p>}
                           </div>
                         )}
@@ -859,14 +859,14 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
           </div>
 
           {/* ---- Business Info (corporations) ---- */}
-          {client.client_type === 'corporation' && (client.code_naf || client.effectif || client.chiffre_affaire) && (
+          {client.clientType === 'corporation' && (client.codeNaf || client.effectif || client.chiffreAffaire) && (
             <div className="bg-[--k-surface] rounded-2xl shadow-sm shadow-black/[0.03] border border-[--k-border] p-5">
               <h5 className="text-[14px] font-semibold text-[--k-text] mb-3">Informations entreprise</h5>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-[13px]">
-                {client.code_naf && (
+                {client.codeNaf && (
                   <div>
                     <p className="text-[--k-muted]">Code NAF</p>
-                    <p className="font-medium text-[--k-text]">{client.code_naf}</p>
+                    <p className="font-medium text-[--k-text]">{client.codeNaf}</p>
                   </div>
                 )}
                 {client.effectif && (
@@ -875,10 +875,10 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                     <p className="font-medium text-[--k-text]">{client.effectif}</p>
                   </div>
                 )}
-                {client.chiffre_affaire && (
+                {client.chiffreAffaire && (
                   <div>
                     <p className="text-[--k-muted]">Chiffre d'affaires</p>
-                    <p className="font-medium text-[--k-text]">{formatCurrency(client.chiffre_affaire)}</p>
+                    <p className="font-medium text-[--k-text]">{formatCurrency(client.chiffreAffaire)}</p>
                   </div>
                 )}
               </div>
@@ -935,11 +935,11 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                       <div className="flex items-center gap-2">
                         <div className="w-7 h-7 rounded-full bg-[--k-primary-2] flex items-center justify-center">
                           <span className="text-xs font-medium text-[--k-primary]">
-                            {(comment.user_name || 'U')[0].toUpperCase()}
+                            {(comment.userName || 'U')[0].toUpperCase()}
                           </span>
                         </div>
-                        <span className="text-[13px] font-medium text-[--k-text]">{comment.user_name || 'Utilisateur'}</span>
-                        <span className="text-[11px] text-[--k-muted]">{formatDateTime(comment.created_at)}</span>
+                        <span className="text-[13px] font-medium text-[--k-text]">{comment.userName || 'Utilisateur'}</span>
+                        <span className="text-[11px] text-[--k-muted]">{formatDateTime(comment.createdAt)}</span>
                       </div>
                       <button
                         onClick={() => handleDeleteComment(comment.id)}
@@ -958,12 +958,12 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                         {comment.attachments.map((file) => (
                           <a
                             key={file.id}
-                            href={attachmentUrl(file.file_path)}
+                            href={attachmentUrl(file.filePath)}
                             target="_blank"
                             rel="noreferrer"
                             className="inline-flex items-center gap-1 px-2 py-1 text-[11px] bg-[--k-surface-2] text-[--k-muted] rounded-lg hover:brightness-95"
                           >
-                            {file.file_name}
+                            {file.fileName}
                           </a>
                         ))}
                       </div>
@@ -1038,42 +1038,42 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
               <div className="border-t border-[--k-border] pt-3 space-y-2.5">
                 <div className="flex justify-between">
                   <span className="text-[--k-muted]">Groupe</span>
-                  <span className="text-[--k-text] font-medium">{client.groupe_client?.nom || '--'}</span>
+                  <span className="text-[--k-text] font-medium">{client.groupeClient?.nom || '--'}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[--k-muted]">Source</span>
-                  <span className="text-[--k-text] font-medium">{client.source_lead?.nom || '--'}</span>
+                  <span className="text-[--k-text] font-medium">{client.sourceLead?.nom || '--'}</span>
                 </div>
-                {client.code_quadra && (
+                {client.codeQuadra && (
                   <div className="flex justify-between">
                     <span className="text-[--k-muted]">Code Quadra</span>
-                    <span className="text-[--k-text] font-medium">{client.code_quadra}</span>
+                    <span className="text-[--k-text] font-medium">{client.codeQuadra}</span>
                   </div>
                 )}
               </div>
 
-              {client.contact_raison && (
+              {client.contactRaison && (
                 <div className="border-t border-[--k-border] pt-3">
                   <p className="text-[--k-muted] mb-1">Contact pour</p>
-                  <p className="text-[--k-text] font-medium">{client.contact_raison}</p>
+                  <p className="text-[--k-text] font-medium">{client.contactRaison}</p>
                 </div>
               )}
 
-              {client.connaissance_selfizee && (
+              {client.connaissanceSelfizee && (
                 <div className="border-t border-[--k-border] pt-3">
                   <p className="text-[--k-muted] mb-1">Comment a-t-il connu ?</p>
-                  <p className="text-[--k-text]">{client.connaissance_selfizee}</p>
+                  <p className="text-[--k-text]">{client.connaissanceSelfizee}</p>
                 </div>
               )}
 
               <div className="border-t border-[--k-border] pt-3">
                 <p className="text-[--k-muted] mb-1">Création du client</p>
                 <p className="text-[--k-text]">
-                  Créé le : <em>{formatDate(client.created_at)}</em>
+                  Créé le : <em>{formatDate(client.createdAt)}</em>
                 </p>
-                {client.updated_at && client.updated_at !== client.created_at && (
+                {client.updatedAt && client.updatedAt !== client.createdAt && (
                   <p className="text-[--k-text] mt-0.5">
-                    Modifié le : <em>{formatDate(client.updated_at)}</em>
+                    Modifié le : <em>{formatDate(client.updatedAt)}</em>
                   </p>
                 )}
               </div>

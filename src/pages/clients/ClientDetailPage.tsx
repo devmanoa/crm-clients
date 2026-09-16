@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useClientStore } from '@/stores/clientStore';
 import { clientService } from '@/services/clientService';
-import { formatDate, formatDateTime, formatCurrency } from '@/lib/utils';
+import { formatDate, formatDateTime, formatCurrency, sanitizeHtml } from '@/lib/utils';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import RichTextEditor, { type RichTextEditorRef } from '@/components/common/RichTextEditor';
 import FloatingTooltip from '@/components/common/FloatingTooltip';
@@ -17,6 +17,16 @@ import CreateDevisModal from '@/components/devis/CreateDevisModal';
 import type { ClientComment, DevisRef, FactureRef, AvoirRef, ReglementRef } from '@/types/client';
 
 type Tab = 'devis' | 'factures' | 'avoirs' | 'reglements' | 'opportunities' | 'contacts' | 'retard';
+
+// Build the public URL for a comment attachment. The API now stores only the
+// stored filename and serves it under /uploads. Legacy rows may still hold a
+// full URL or path — pass those through unchanged.
+function attachmentUrl(filePath: string): string {
+  if (/^https?:\/\//i.test(filePath)) return filePath;
+  const base = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+  const name = filePath.split(/[\\/]/).pop() || filePath;
+  return `${base}/uploads/${name}`;
+}
 
 const DEVIS_STATUS_LABELS: Record<string, { label: string; color: string; bg: string }> = {
   brouillon: { label: 'Brouillon', color: 'text-gray-600', bg: 'bg-gray-100' },
@@ -925,14 +935,14 @@ const sumFactureTtc = (list: FactureRef[]) => list.reduce((s, f) => s + (Number(
                     </div>
                     <div
                       className="comment-content text-[13px] text-[--k-text]"
-                      dangerouslySetInnerHTML={{ __html: comment.contenu }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHtml(comment.contenu) }}
                     />
                     {comment.attachments && comment.attachments.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-2">
                         {comment.attachments.map((file) => (
                           <a
                             key={file.id}
-                            href={file.file_path}
+                            href={attachmentUrl(file.file_path)}
                             target="_blank"
                             rel="noreferrer"
                             className="inline-flex items-center gap-1 px-2 py-1 text-[11px] bg-[--k-surface-2] text-[--k-muted] rounded-lg hover:brightness-95"

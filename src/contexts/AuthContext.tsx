@@ -51,8 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let tokenRefreshInterval: ReturnType<typeof setInterval>;
 
-    // Skip Keycloak if auth is disabled
-    if (import.meta.env.VITE_DISABLE_AUTH === 'true') {
+    // Skip Keycloak if auth is disabled. Gated on import.meta.env.DEV so a
+    // production build can never ship the fake admin session, even if the
+    // env var is left set on the build machine.
+    if (import.meta.env.DEV && import.meta.env.VITE_DISABLE_AUTH === 'true') {
       setIsAuthenticated(true);
       setUser({
         id: 'dev-user',

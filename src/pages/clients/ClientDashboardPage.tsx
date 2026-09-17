@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Users, Building2, FileText, Receipt, TrendingUp, TrendingDown,
-  AlertTriangle, Wallet, Copy, MailWarning,
+  AlertTriangle, Wallet, BadgeCheck, MailWarning,
 } from 'lucide-react';
 import { clientService } from '@/services/clientService';
 import { formatCurrency } from '@/lib/utils';
@@ -44,11 +44,21 @@ function shortAmount(n: number): string {
   return `${Math.round(n)} €`;
 }
 
+/** « oct. 2024 → sept. 2025 » : la période couverte n'est pas forcément récente. */
+function monthRangeLabel(first: string, last: string): string {
+  const fmt = (iso: string) =>
+    new Date(`${iso}-01`).toLocaleDateString('fr-FR', { month: 'short', year: 'numeric' });
+  return `${fmt(first)} → ${fmt(last)}`;
+}
+
 function monthLabel(iso: string): string {
   const [y, m] = iso.split('-');
-  return new Date(Number(y), Number(m) - 1, 1)
+  const label = new Date(Number(y), Number(m) - 1, 1)
     .toLocaleDateString('fr-FR', { month: 'short' })
     .replace('.', '');
+  // Janvier porte l'année : la période affichée n'est pas forcément la
+  // dernière, un axe « janv » sans repère serait ambigu.
+  return m === '01' ? `${label} ${y.slice(2)}` : label;
 }
 
 /** Tuile d'indicateur. Le nombre porte le message, l'icône est secondaire. */
@@ -395,7 +405,14 @@ export default function ClientDashboardPage() {
       {/* Activité sur 12 mois */}
       <div className="bg-[--k-surface] rounded-2xl shadow-sm shadow-black/[0.03] border border-[--k-border] p-4">
         <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-          <h2 className="text-[14px] font-semibold text-[--k-text]">Activité sur 12 mois</h2>
+          <div>
+            <h2 className="text-[14px] font-semibold text-[--k-text]">Activité mensuelle</h2>
+            {monthly.length > 0 && (
+              <p className="text-[12px] text-[--k-muted] mt-0.5">
+                {monthRangeLabel(monthly[0].month, monthly[monthly.length - 1].month)}
+              </p>
+            )}
+          </div>
           <div className="flex items-center gap-4 text-[12px] text-[--k-muted]">
             <span className="flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-sm" style={{ background: SERIES_DEVIS }} />
@@ -530,11 +547,10 @@ export default function ClientDashboardPage() {
           hint={`${Math.round((clients.persons / Math.max(1, clients.total)) * 100)} % du portefeuille`}
         />
         <StatTile
-          icon={<Copy className="w-4 h-4" />}
+          icon={<BadgeCheck className="w-4 h-4" />}
           label="Clients qualifiés"
           value={clients.qualified.toLocaleString('fr-FR')}
-          to="/clients/duplicates"
-          hint="Voir aussi les doublons à traiter"
+          hint={`${Math.round((clients.qualified / Math.max(1, clients.total)) * 100)} % du portefeuille`}
         />
       </div>
     </div>

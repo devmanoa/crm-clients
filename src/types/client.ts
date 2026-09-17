@@ -324,6 +324,38 @@ export interface ClientFormData {
   addresses?: ClientAddressFormData[];
 }
 
+// Tableau de bord
+
+export interface DashboardStats {
+  clients: {
+    total: number;
+    corporations: number;
+    persons: number;
+    qualified: number;
+    newThisMonth: number;
+    newPrevMonth: number;
+    withoutEmail: number;
+  };
+  devis: {
+    total: number;
+    byStatus: Record<string, { count: number; totalHt: number }>;
+    /** Part des devis acceptés parmi ceux tranchés, en %. null si aucun. */
+    conversionRate: number | null;
+    pendingAmount: number;
+  };
+  factures: {
+    total: number;
+    byStatus: Record<string, { count: number; totalTtc: number }>;
+    revenue: number;
+    outstanding: number;
+    overdueCount: number;
+  };
+  /** 12 derniers mois, du plus ancien au plus récent. `month` au format YYYY-MM. */
+  monthly: { month: string; devisHt: number; factureTtc: number }[];
+  topClients: { id: number; label: string; totalTtc: number; factureCount: number }[];
+  bySector: { id: number; nom: string; clientCount: number }[];
+}
+
 // Doublons / fusion
 
 /** Un des deux clients d'une paire de doublons. */

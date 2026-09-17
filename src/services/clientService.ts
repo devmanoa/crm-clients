@@ -1,6 +1,6 @@
 import api from './api';
 import { API_ENDPOINTS } from '../config/api';
-import type { Client, ClientFormData, ClientFilters, ClientContact, ClientAddress, ClientComment, DevisRef, FactureRef, AvoirRef, ReglementRef, GroupeClient, SourceLead, SecteurActivite, Country, ContactType, DuplicatePair, MergePreview, MergeResult } from '../types/client';
+import type { Client, ClientFormData, ClientFilters, ClientContact, ClientAddress, ClientComment, DevisRef, FactureRef, AvoirRef, ReglementRef, GroupeClient, SourceLead, SecteurActivite, Country, ContactType, DuplicatePair, MergePreview, MergeResult, DashboardStats } from '../types/client';
 import type { PaginatedResponse, ApiResponse } from '../types/common';
 
 export const clientService = {
@@ -85,6 +85,12 @@ export const clientService = {
 
   async deleteContact(clientId: number, id: number): Promise<ApiResponse<{ message: string }>> {
     const { data } = await api.delete(API_ENDPOINTS.CLIENTS.CONTACT(clientId, id));
+    return data;
+  },
+
+  // Dashboard
+  async getDashboardStats(): Promise<ApiResponse<DashboardStats>> {
+    const { data } = await api.get(API_ENDPOINTS.DASHBOARD.STATS);
     return data;
   },
 

@@ -6,6 +6,7 @@ import ClientListPage from './pages/clients/ClientListPage';
 import ClientCreatePage from './pages/clients/ClientCreatePage';
 import ClientEditPage from './pages/clients/ClientEditPage';
 import ClientDetailPage from './pages/clients/ClientDetailPage';
+import ClientDashboardPage from './pages/clients/ClientDashboardPage';
 import ClientDuplicatesPage from './pages/clients/ClientDuplicatesPage';
 import SectorsPage from './pages/settings/SectorsPage';
 
@@ -26,7 +27,7 @@ function App() {
             {/* Clients */}
             <Route path="clients" element={<ClientListPage />} />
             <Route path="clients/add" element={<ClientCreatePage />} />
-            <Route path="clients/dashboard" element={<div className="p-6"><h1 className="text-2xl font-bold">Tableau de bord clients - A venir</h1></div>} />
+            <Route path="clients/dashboard" element={<ClientDashboardPage />} />
             <Route path="clients/duplicates" element={<ClientDuplicatesPage />} />
             <Route path="clients/:id" element={<ClientDetailPage />} />
             <Route path="clients/:id/edit" element={<ClientEditPage />} />

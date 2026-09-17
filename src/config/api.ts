@@ -35,6 +35,9 @@ export const API_ENDPOINTS = {
     REGLEMENTS: (clientId: number) => `/api/clients/clients/${clientId}/reglements`,
     REGLEMENTS_ONE: (clientId: number, id: number) => `/api/clients/clients/${clientId}/reglements/${id}`,
   },
+  DASHBOARD: {
+    STATS: '/api/clients/dashboard/stats',
+  },
   SECTORS: {
     LIST: '/api/clients/sectors',
     GET: (id: number) => `/api/clients/sectors/${id}`,
